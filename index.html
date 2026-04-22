@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="about-image">
-                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a2e?w=800&q=80" alt="FITLAB Gimnasio Castelar" loading="lazy">
+                    <img src="fitlab-web/images/fitlab_fachada.png" alt="FITLAB Gimnasio Castelar" loading="lazy">
                 </div>
             </div>
         </div>
@@ -154,6 +154,10 @@
                             <label for="alumno-periodo">Período</label>
                             <input type="date" id="alumno-periodo" name="alumno-periodo">
                         </div>
+                        <div class="form-group">
+                            <label for="alumno-email">Email</label>
+                            <input type="email" id="alumno-email" name="alumno-email" placeholder="email@ejemplo.com">
+                        </div>
                     </div>
                 </div>
 
@@ -168,36 +172,36 @@
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Sentadillas">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="90seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Peso muerto">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="90seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Zancadas">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12 c/p">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="60seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Elevación de talones">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="15">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="60seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Crunch en máquina">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="15">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="45seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                     </div>
                     <button type="button" class="add-exercise-btn" onclick="addExercise('day1-exercises')">+ Agregar ejercicio</button>
@@ -214,36 +218,36 @@
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Press de banco">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="90seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Press inclinado">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="90seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Aperturas en banco">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="60seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Fondos en banco">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="60seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Tríceps polea">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="15">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="45seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                     </div>
                     <button type="button" class="add-exercise-btn" onclick="addExercise('day2-exercises')">+ Agregar ejercicio</button>
@@ -260,36 +264,36 @@
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Arrastre">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="90seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Jornada">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="90seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Remo mancuerna">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="60seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Pullover">
                             <input type="text" class="exercise-sets" placeholder=" series" value="3">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="60seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                         <div class="exercise-row">
                             <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Curl bíceps">
                             <input type="text" class="exercise-sets" placeholder=" series" value="4">
                             <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-rest" placeholder=" descanso" value="45seg">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">×</button>
+                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
+                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
                         </div>
                     </div>
                     <button type="button" class="add-exercise-btn" onclick="addExercise('day3-exercises')">+ Agregar ejercicio</button>
@@ -399,7 +403,7 @@
 <a href="#" class="logo"><img src="fitlab-web/images/logo.jpg" alt="FITLAB" height="50"></a>
                     <p>El gimnasio que transforma tu cuerpo y tu estilo de vida. Únete a la comunidad FITLAB y alcanzá tus metas.</p>
                     <div class="social-links">
-                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="https://www.instagram.com/fitlabfitnesscenter/" aria-label="Instagram">📷</a>
                         <a href="#" aria-label="Facebook">📘</a>
                         <a href="#" aria-label="YouTube">📺</a>
                         <a href="#" aria-label="TikTok">🎵</a>
@@ -419,7 +423,7 @@
                     <h4>Contacto</h4>
                     <ul>
                         <li><a href="https://wa.me/54911123456789">WhatsApp</a></li>
-                        <li><a href="https://instagram.com/fitlab">Instagram</a></li>
+                        <li><a href="https://www.instagram.com/fitlabfitnesscenter/">Instagram</a></li>
                         <li><a href="https://facebook.com/fitlab">Facebook</a></li>
                         <li><a href="mailto:hola@fitlab.com">Email</a></li>
                     </ul>

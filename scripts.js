@@ -66,15 +66,15 @@ function addExercise(containerId) {
 
     const restInput = document.createElement('input');
     restInput.type = 'text';
-    restInput.className = 'exercise-rest';
-    restInput.placeholder = 'descanso';
+    restInput.className = 'exercise-obs';
+    restInput.placeholder = 'obs';
     newRow.appendChild(restInput);
 
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'remove-exercise';
     removeBtn.setAttribute('aria-label', 'Eliminar ejercicio');
-    removeBtn.textContent = '×';
+    removeBtn.textContent = '🗑';
     newRow.appendChild(removeBtn);
 
     // Add row to container
@@ -93,7 +93,7 @@ document.querySelectorAll('.remove-exercise').forEach(btn => {
     });
 });
 
-// Save routine - Generate printable PDF
+// Save routine - Open print dialog
 function saveRoutine() {
     const nombre = document.getElementById('alumno-nombre').value || 'Alumno';
     const edad = document.getElementById('alumno-edad').value;
@@ -111,30 +111,23 @@ function saveRoutine() {
     <title>Rutina - ${nombre}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        @page { size: A4; margin: 15mm; }
         body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11pt; color: #000; }
         .header { border: 2px solid #000; padding: 20px; margin-bottom: 20px; }
-        .header h1 { font-size: 24pt; font-weight: bold; color: #000; }
+        .header h1 { font-size: 24pt; font-weight: bold; }
         .header p { font-size: 11pt; color: #333; margin-top: 5px; }
         .info-box { border: 1px solid #000; padding: 15px 20px; margin-bottom: 25px; }
-        .info-row { display: flex; gap: 30px; margin-bottom: 8px; flex-wrap: wrap; }
         .info-label { font-weight: bold; }
         .day-section { margin-bottom: 25px; page-break-inside: avoid; }
-        .day-header { border: 2px solid #000; border-bottom: none; padding: 10px 15px; font-size: 12pt; font-weight: bold; background: #fff; }
+        .day-header { border: 2px solid #000; border-bottom: none; padding: 10px 15px; font-size: 12pt; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; border: 2px solid #000; }
-        th { background: #fff; border: 1px solid #000; text-align: left; padding: 8px; font-size: 9pt; font-weight: bold; }
-        td { padding: 8px; border: 1px solid #000; }
-        tr:nth-child(even) { background: #fff; }
+        th { border: 1px solid #000; padding: 8px; font-size: 9pt; font-weight: bold; text-align: left; }
+        td { border: 1px solid #000; padding: 8px; }
         .col-num { width: 30px; text-align: center; }
         .col-sets { width: 60px; text-align: center; }
         .col-reps { width: 80px; text-align: center; }
         .col-rest { width: 80px; text-align: center; }
-        @page {
-            margin: 0;
-        }
         @media print {
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .day-section { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -145,15 +138,9 @@ function saveRoutine() {
     </div>
 
     <div class="info-box">
-        <div class="info-row">
-            <span><span class="info-label">Alumno:</span> ${nombre.toUpperCase()}</span>
-            ${edad ? `<span><span class="info-label">Edad:</span> ${edad} años</span>` : ''}
-            ${objetivo ? `<span><span class="info-label">Objetivo:</span> ${objetivoLabels[objetivo] || objetivo}</span>` : ''}
-            ${periodoFormateado ? `<span><span class="info-label">Período:</span> ${periodoFormateado}</span>` : ''}
-        </div>
+        <p><span class="info-label">Alumno:</span> ${nombre.toUpperCase()}</span> ${edad ? `<span class="info-label">Edad:</span> ${edad} años` : ''} ${objetivo ? `<span class="info-label">Objetivo:</span> ${objetivoLabels[objetivo] || objetivo}` : ''} ${periodoFormateado ? `<span class="info-label">Período:</span> ${periodoFormateado}` : ''}</p>
     </div>`;
 
-    // Days
     for (let day = 1; day <= 3; day++) {
         const dayTitle = document.getElementById(`day${day}-title`).value || `Día ${day}`;
         const exercises = document.querySelectorAll(`#day${day}-exercises .exercise-row`);
@@ -168,7 +155,7 @@ function saveRoutine() {
                     <th>EJERCICIO</th>
                     <th class="col-sets">SERIES</th>
                     <th class="col-reps">REPS</th>
-                    <th class="col-rest">DESCANSO</th>
+                    <th class="col-rest">OBS</th>
                 </tr>
             </thead>
             <tbody>`;
@@ -177,7 +164,7 @@ function saveRoutine() {
             const name = row.querySelector('.exercise-name').value;
             const sets = row.querySelector('.exercise-sets').value;
             const reps = row.querySelector('.exercise-reps').value;
-            const rest = row.querySelector('.exercise-rest').value;
+            const rest = row.querySelector('.exercise-obs').value;
 
             if (name) {
                 html += `
@@ -201,7 +188,6 @@ function saveRoutine() {
 </body>
 </html>`;
 
-    // Open print dialog
     const printWindow = window.open('', '_blank');
     printWindow.document.write(html);
     printWindow.document.close();

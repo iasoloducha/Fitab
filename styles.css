@@ -457,8 +457,8 @@ header.scrolled {
 
 .exercise-row {
     display: grid;
-    grid-template-columns: 2fr 80px 80px 100px 40px;
-    gap: 10px;
+    grid-template-columns: 2fr 70px 70px 70px 50px;
+    gap: 8px;
     align-items: center;
 }
 
@@ -473,28 +473,50 @@ header.scrolled {
     transition: border-color 0.3s ease;
 }
 
-.exercise-row input:focus {
-    outline: none;
-    border-color: var(--naranja);
-}
-
 .exercise-name {
     font-weight: 600;
+}
+
+.exercise-obs {
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .exercise-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .exercise-name {
+        grid-column: 1 / -1;
+    }
+
+    .exercise-sets,
+    .exercise-reps,
+    .exercise-obs {
+        width: 100%;
+    }
+
+    .remove-exercise {
+        grid-column: 2;
+        justify-self: end;
+    }
 }
 
 .remove-exercise {
     background-color: transparent;
     border: 2px solid var(--gris-oscuro);
     color: var(--gris-medio);
-    font-size: 1.5rem;
+    font-size: 1rem;
     cursor: pointer;
     border-radius: 8px;
-    width: 40px;
+    padding: 0;
+    width: 50px;
     height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: all 0.3s ease;
+    justify-self: end;
+    align-self: center;
 }
 
 .remove-exercise:hover {
@@ -537,7 +559,24 @@ header.scrolled {
     font-family: 'Oswald', sans-serif;
     font-size: 1.3rem;
     color: var(--naranja);
-    min-width: 60px;
+    min-width: 50px;
+}
+
+.day-title-input {
+    max-width: 200px;
+    padding: 10px 15px;
+    background-color: var(--negro-claro);
+    border: 2px solid var(--gris-oscuro);
+    border-radius: 8px;
+    color: var(--blanco);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: border-color 0.3s ease;
+}
+
+.exercise-obs {
+    width: 100%;
 }
 
 .day-title-input {
