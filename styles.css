@@ -105,6 +105,18 @@ a {
     color: var(--negro);
 }
 
+.btn-app {
+    background-color: var(--verde);
+    border-color: var(--verde);
+    color: var(--blanco);
+}
+
+.btn-app:hover {
+    background-color: #00c496;
+    color: var(--blanco);
+    border-color: #00c496;
+}
+
 .btn-full {
     width: 100%;
     text-align: center;
@@ -168,6 +180,18 @@ header.scrolled {
 
 .nav-menu a:hover {
     color: var(--naranja);
+}
+
+.nav-app {
+    background: var(--naranja);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: var(--blanco) !important;
+}
+
+.nav-app:hover {
+    background: #ff6b35;
+    color: var(--blanco) !important;
 }
 
 .nav-toggle {
