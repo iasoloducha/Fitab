@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+<link rel="icon" type="image/gif" href="/favicon.gif"/>
+<link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad-retina.png" />
+<title>2D Vector Graphics: PostScript, Processing, SVG - Hyperpolyglot</title>
+<style type="text/css" id="internal-style">
+@import url(hyperpolyglot.css);
+</style>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+<meta http-equiv="content-language" content="en"/>
+</head>
+<body>
+<div id="container-wrap-wrap">
+  <div id="container-wrap">
+    <div id="container">
+      <div id="header">
+        <h1><a href="/"><span>Hyperpolyglot</span></a></h1>
+      </div>
+      <div id="content-wrap">
+        <div id="main-content">
+<div id="page-title">
+                            2D Vector Graphics: PostScript, Processing, SVG
+                        </div>
+<div id="page-content">
+                        
+
+<p><a name="top" id="top"></a><a href="#coordinates">coordinates</a> | <a href="#paths">paths</a> | <a href="#shapes">shapes</a> | <a href="#color">color</a> | <a href="#text">text</a> | <a href="#groups">groups</a> | <a href="#masks-filters">masks and filters</a></p>
+<table class="wiki-content-table"><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td><a name="hello-world" id="hello-world"></a><a href="#hello-world-note">hello world</a></td>
+<td><span style="color: gray"><em>hello.ps:</em></span><br /><br />
+/Helvetica-Bold 20 selectfont<br />
+72 72 moveto (hello, world!) show</td>
+<td><span style="color: gray"><em>hello.pde:</em></span><br /><br />
+size(400, 400);<br />
+background(255);<br />
+PFont f = createFont("Arial", 16, true);<br />
+fill(0);<br />
+textFont(f, 36);<br />
+text("hello world!", 10, 100);</td>
+<td><span style="color: gray"><em>hello.html:</em></span><br /><br />
+&lt;<span style="color: purple">!DOCTYPE</span> html&gt;<br />
+&lt;<span style="color: mediumblue">html</span>&gt;<br /><span style="white-space: pre-wrap;">  </span>&lt;<span style="color: mediumblue">body</span>&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>&lt;<span style="color: mediumblue">svg</span> <span style="color: peru">width</span>=<span style="color: maroon">"400"</span> <span style="color: peru">height</span>=<span style="color: maroon">"400"</span>&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>&lt;<span style="color: mediumblue">text</span> <span style="color: peru">x</span>=<span style="color: maroon">"100"</span> <span style="color: peru">y</span>=<span style="color: maroon">"100"</span>&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>hello world!<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>&lt;<span style="color: mediumblue">/text</span>&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>&lt;<span style="color: mediumblue">/svg</span>&gt;<br /><span style="white-space: pre-wrap;">  </span>&lt;<span style="color: mediumblue">/body</span>&gt;<br />
+&lt;<span style="color: mediumblue">/html</span>&gt;</td>
+</tr><tr><td><a name="comment" id="comment"></a><a href="#comment-note">comment</a></td>
+<td><span style="color: gray">% comment</span><br /><span style="color: gray">% another comment</span></td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> comment</span><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> another comment</span><br /><br /><span style="color: gray">/* comment<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;"> </span>another comment */</span></td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">&lt;!--</span> comment<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;"> </span>another comment <span style="white-space: pre-wrap;">--&gt;</span></span></td>
+</tr><tr><td><a name="deub-msg" id="deub-msg"></a><a href="#debug-msg-note">debug message</a><br /><span style="white-space: pre-wrap;"> </span></td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td>println("DEBUG: height: " + height);</td>
+<td><span style="color: gray"><em>none</em></span></td>
+</tr><tr><th colspan="4"><a name="coordinates" id="coordinates"></a><a href="#coordinates-note">coordinates</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td><a name="origin" id="origin"></a><a href="#origin-note">origin</a></td>
+<td><span style="color: gray"><em>lower left</em></span></td>
+<td><span style="color: gray"><em>upper left</em></span></td>
+<td><span style="color: gray"><em>upper left</em></span></td>
+</tr><tr><td><a name="unit" id="unit"></a><a href="#unit">unit</a></td>
+<td><span style="color: gray"><em>72 units per inch; i.e. each unit is the customary size of a point in the English-speaking world</em></span></td>
+<td><span style="color: gray"><em>one pixel per unit</em></span></td>
+<td><span style="color: gray"><em>one pixel per unit</em></span></td>
+</tr><tr><td><a name="coordinate-system" id="coordinate-system"></a><a href="#coordinate-system-note">coordinate system</a></td>
+<td><span style="color: gray">% move origin 72 units up and to the right:</span><br />
+72 72 translate<br /><br /><span style="color: gray">% increase size of unit 72-fold:</span><br />
+72 72 scale<br /><br /><span style="color: gray">% rotate coordinates 90 degrees counterclockwise:</span><br />
+90 rotate</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> move origin to (100, 200):</span><br />
+translate(100, 200);<br /><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> double x-scale and triple y-scale:</span><br />
+scale(2, 3);<br /><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> rotate coordinates 90 degrees<br /><span style="white-space: pre-wrap;">//</span> clockwise:</span><br />
+rotate(PI/2);</td>
+<td>&lt;g transform="translate(50, 100)"&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="color: gray">&lt;!<span style="white-space: pre-wrap;">--</span> origin at (50, 100) <span style="white-space: pre-wrap;">--</span>&gt;</span><br />
+&lt;/g&gt;<br /><br />
+&lt;g transform="rotate(30)"&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="color: gray">&lt;!<span style="white-space: pre-wrap;">--</span> rotate coordinates 30 degrees<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;"> </span>clockwise <span style="white-space: pre-wrap;">--</span>&gt;</span><br />
+&lt;/g&gt;<br /><br />
+&lt;g transform="scale(2, 3)"&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="color: gray">&lt;!<span style="white-space: pre-wrap;">--</span> double x-scale and triple<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;"> </span>y-scale <span style="white-space: pre-wrap;">--</span>&gt;</span><br />
+&lt;/g&gt;</td>
+</tr><tr><td><a name="canvas-size" id="canvas-size"></a><a href="#canvas-size-note">canvas size</a></td>
+<td><span style="color: gray">% doesn't work on all devices:</span><br />
+currentpagedevice /PageSize get aload pop<br /><br /><span style="color: gray">% canvas size determined by device</span></td>
+<td>width<br />
+height<br /><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> set width and height:</span><br />
+size(400, 400)</td>
+<td>&lt;svg height="400px" width="400px"&gt;&lt;/svg&gt;</td>
+</tr><tr><th colspan="4"><a name="paths" id="paths"></a><a href="#paths-note">paths</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td><a name="line" id="line"></a><a href="#line-note">line</a></td>
+<td>newpath<br />
+15 25 moveto<br />
+70 90 lineto<br />
+stroke<br /><br /><span style="color: gray">% rlineto uses relative coordinates:</span><br />
+newpath<br />
+15 25 moveto<br />
+55 65 rlineto<br />
+stroke</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> x1, y1, x2, y2:</span><br />
+line(15, 25, 70, 90);</td>
+<td>&lt;line x1="40" y1="20" x2="80" y2="20"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>style="stroke: black;"/&gt;<br /><br />
+&lt;path d="M 40 20 L 80 20"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;<br /><br /><span style="color: gray">&lt;!<span style="white-space: pre-wrap;">--</span> use relative coordinates for 2nd point: <span style="white-space: pre-wrap;">--</span>&gt;</span><br />
+&lt;path d="M 40 20 l 40 0"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;</td>
+</tr><tr><td><a name="stroke-width" id="stroke-width"></a><a href="#stroke-width-note">stroke width</a></td>
+<td>2 setlinewidth<br />
+newpath<br />
+15 25 moveto<br />
+70 90 lineto<br />
+stroke</td>
+<td>strokeWeight(2);<br />
+line(15, 25, 70, 90);</td>
+<td>&lt;line x1="40" y1="20" x2="80" y2="20"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>style="stroke: black;"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke-width="4"/&gt;</td>
+</tr><tr><td><a name="line-cap" id="line-cap"></a><a href="#line-cap-note">line caps</a><br /><span style="color: gray"><em>butt, round, square</em></span></td>
+<td>0 setlinecap<br />
+1 setlinecap<br />
+2 setlinecap</td>
+<td>strokeCap(SQUARE);<br />
+strokeCap(ROUND);<br />
+strokeCap(PROJECT);</td>
+<td>&lt;line x1="10" y1="15" x2="50" y2="15"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>style="stroke-linecap: butt;"/&gt;<br /><br />
+&lt;line x1="10" y1="45" x2="50" y2="45"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>style="stroke-linecap: round;"/&gt;<br /><br />
+&lt;line x1="10" y1="75" x2="50" y2="75"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>style="stroke-linecap: square;"/&gt;</td>
+</tr><tr><td><a name="dashed-line" id="dashed-line"></a><a href="#dashed-line-note">dashed line</a></td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><td><a name="polyline" id="polyline"></a><a href="#polyline-note">polyline</a></td>
+<td>newpath<br />
+10 10 moveto<br />
+20 20 lineto<br />
+30 10 lineto<br />
+40 20 lineto<br />
+stroke</td>
+<td>line(10, 10, 20, 20);<br />
+line(20, 20, 30, 10);<br />
+line(30, 10, 40, 20);</td>
+<td>&lt;polyline points="10,10,20,20,30,10,40,20"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>fill="none"/&gt;<br /><br />
+&lt;path d="M 10 10 L 20 20 30 10 40 20"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;</td>
+</tr><tr><td><a name="line-join" id="line-join"></a><a href="#line-join-note">line join</a><br /><span style="color: gray"><em>miter, round, bevel</em></span></td>
+<td>0 setlinejoin<br />
+1 setlinejoin<br />
+2 setlinejoin</td>
+<td>strokeJoin(MITER);<br />
+strokeJoin(ROUND);<br />
+strokeJoin(BEVEL);</td>
+<td></td>
+</tr><tr><td><a name="miter-limit" id="miter-limit"></a><a href="#miter-limit-note">miter limit</a></td>
+<td>2 setmiterlimit</td>
+<td></td>
+<td></td>
+</tr><tr><td><a name="circular-arc" id="circular-arc"></a><a href="#circular-arc-note">circular arc</a></td>
+<td><span style="color: gray">% creates half-circular arc centered at<br />
+% (144,144) with radius 40:</span><br />
+newpath<br />
+144 144 40 90 270 arc<br />
+stroke</td>
+<td>noFill();<br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> circular when 3rd and 4th args<br /><span style="white-space: pre-wrap;">//</span> are the same:</span><br />
+arc(144, 144, 40, 40, HALF_PI, 3*HALF_PI)</td>
+<td>&lt;path d="M 144 104 A 40 40 0 1 1 144 184"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;</td>
+</tr><tr><td><a name="elliptic-arc" id="elliptic-arc"></a><a href="#elliptic-arc-note">elliptic arc</a></td>
+<td>gsave<br />
+2 1 scale<br />
+newpath<br />
+144 144 40 90 270 arc<br />
+stroke<br />
+grestore</td>
+<td>noFill();<br />
+arc(144, 144, 80, 40, HALF_PI, 3*HALF_PI);</td>
+<td>&lt;path d="M 144 104 A 80 40 0 1 1 144 184"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;</td>
+</tr><tr><td><a name="quadratic-bezier" id="quadratic-bezier"></a><a href="#quadratic-bezier-note">quadratic bezier</a></td>
+<td><span style="color: gray"><em>None. If the control points of a quadratic bezier are Q<sub>0</sub>, Q<sub>1</sub>, and Q<sub>2</sub>, the equivalent cubic bezier has control points C<sub>0</sub> = Q<sub>0</sub>, C<sub>1</sub> = Q<sub>0</sub> + 2Q<sub>1</sub>, C<sub>2</sub> = 2Q<sub>1</sub> + Q<sub>2</sub>, and C<sub>3</sub> = Q<sub>2</sub>.</em></span></td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td>&lt;path d="M 144 144 Q 288 216 144 288"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;</td>
+</tr><tr><td><a name="cubic-bezier" id="cubic-bezier"></a><a href="#cubic-bezier-note">cubic bezier</a></td>
+<td><span style="color: gray">% control points are (144,144), (288,144),<br />
+% (288,288), and (144,288):</span><br />
+newpath<br />
+144 144 moveto<br />
+288 144 288 288 144 288 curveto<br />
+stroke</td>
+<td>noFill();<br />
+bezier(144, 144, 288, 144, 288, 288, 144, 288);</td>
+<td>&lt;path d="M 144 144 C 288 144 288 288 144 288"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>stroke="black" fill="none"/&gt;</td>
+</tr><tr><th colspan="4"><a name="shapes" id="shapes"></a><a href="#shapes-note">shapes</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td><a name="polygon" id="polygon"></a><a href="#polygon-note">polygon</a></td>
+<td><span style="color: gray">% creates outline of triangle:</span><br />
+newpath<br />
+72 72 moveto<br />
+144 144 lineto<br />
+144 72 lineto<br />
+closepath<br />
+stroke</td>
+<td>noFill();<br /><br />
+triangle(72, 72, 144, 144, 144, 72);<br /><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> quadrilateral:</span><br />
+quad(10, 20, 250, 10, 260, 270, 30, 240);</td>
+<td>&lt;polygon points="72,72,72,144,144,144"/&gt;</td>
+</tr><tr><td><a name="fill" id="fill"></a><a href="#fill-note">fill</a></td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><td><a name="rectangle" id="rectangle"></a><a href="#rectangle-note">rectangle</a></td>
+<td><span style="color: gray">% x y width height:</span><br />
+200 100 40 20 rectstroke<br /><br /><span style="color: gray">% solid:</span><br />
+200 100 40 20 rectfill</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> x, y, width, height:</span><br />
+rect(200, 300, 12, 14);</td>
+<td>&lt;rect x="200" y="300"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>height="12" width="14"/&gt;</td>
+</tr><tr><td><a name="rounded-rectangle" id="rounded-rectangle"></a><a href="#rounded-rectangle-note">rounded rectangle</a></td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td>rect(200, 200, 150, 120, 20);</td>
+<td>&lt;rect x="200" y="200"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>height="150" width="120"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>rx="20" ry="20"/&gt;</td>
+</tr><tr><td><a name="circle" id="circle"></a><a href="#circle-note">circle</a></td>
+<td>newpath<br />
+144 144 40 0 360 arc<br />
+stroke</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> first two args are x and y<br /><span style="white-space: pre-wrap;">//</span> set last two args to radius:</span><br />
+ellipse(50, 50, 80, 80);</td>
+<td>&lt;circle cx="300" cy="200"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>r="35" fill="green"/&gt;</td>
+</tr><tr><td><a name="ellipse" id="ellipse"></a><a href="#ellipse-note">ellipse</a></td>
+<td>gsave<br />
+1 1.6666 scale<br />
+newpath<br />
+144 144 40 0 360 arc<br />
+stroke<br />
+grestore</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> x, y, rx, ry:</span><br />
+ellipse(100, 100, 80, 120);</td>
+<td>&lt;ellipse cx="300" cy="100"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;"> </span>rx="30" ry="50"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;"> </span>fill="red"/&gt;</td>
+</tr><tr><th colspan="4"><a name="color" id="color"></a><a href="#color-note">color</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td><a name="grayscale" id="grayscale"></a><a href="#grayscale-note">grayscale</a><br /><span style="color: gray"><em>black, white, gray</em></span></td>
+<td>0 setgray<br />
+1 setgray<br />
+0.5 setgray</td>
+<td>fill(0);<br />
+fill(255);<br />
+fill(127);</td>
+<td></td>
+</tr><tr><td>rgb color</td>
+<td><span style="color: gray"><em>default color is black. Sets current color to red:</em></span><br />
+1.0 0.0 0.0 setrgbcolor</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> this is the default:</span><br />
+colorMode(RGB, 256);<br /><br />
+color red = color(255, 0, 0);<br />
+color green = color(0, 255, 0);<br />
+color blue = color(0, 0, 255);<br /><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> another way to make red:</span><br />
+color red = #FF0000;<br /><br /><span style="color: gray"><span style="white-space: pre-wrap;">//</span> set fill color to red:</span><br />
+fill(red);</td>
+<td></td>
+</tr><tr><td>hsb color</td>
+<td>sethsbcolor</td>
+<td><span style="color: gray"><span style="white-space: pre-wrap;">//</span> with scale from 0 to 99:</span><br />
+colorMode(HSB, 100);</td>
+<td></td>
+</tr><tr><td>named color</td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td><span style="color: gray"><em>HTML 4.1 defines 16 named colors, the same used by VGA; in practice most browsers recognize the X Windows color names</em></span></td>
+</tr><tr><td>background color</td>
+<td>clippath 1 0.75 0.75 setrgbcolor fill<br />
+0 setgray</td>
+<td>color pink = color(255, 191, 191);<br />
+background(pink);</td>
+<td></td>
+</tr><tr><td>stroke color</td>
+<td><span style="color: gray"><em>stroke and fill color are the same</em></span></td>
+<td>color red = color(255, 0, 0);<br />
+stroke(red);<br />
+noStroke()</td>
+<td></td>
+</tr><tr><td>fill color</td>
+<td><span style="color: gray"><em>stroke and fill color are the same</em></span></td>
+<td>fill(red);<br />
+noFill();</td>
+<td></td>
+</tr><tr><td>opacity</td>
+<td><span style="color: gray"><em>no support for transparency</em></span></td>
+<td></td>
+<td></td>
+</tr><tr><th colspan="4"><a name="text" id="text"></a><a href="#text-note">text</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td>font</td>
+<td>/Helvetica 20 selectfont</td>
+<td>PFont f = createFont("Arial", 16, true);</td>
+<td>&lt;text x="100" y="100"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>font-family="Comic Sans MS"&gt;<br /><span style="white-space: pre-wrap;">  </span>lorem ipsum<br />
+&lt;/text&gt;</td>
+</tr><tr><td>built-in fonts</td>
+<td>/Times-Roman /Times-Italic<br />
+/Times-Bold /Times-BoldItalic<br />
+/Helvetica /Helvetica-Oblique<br />
+/Helvetica-Bold /Helvetica-BoldOblique<br />
+/Courier /Courier-Bold<br />
+/Courier-Oblique /Courier-BoldOblique</td>
+<td><span style="color: gray"><em>has access to system fonts; these are available in the string array</em> PFont.list()</span></td>
+<td>Andale Mono<br />
+Arial<br />
+Arial Black<br />
+Comic Sans MS<br />
+Courier New<br />
+Georgia<br />
+Impact<br />
+Times New Roman<br />
+Trebuchet MS<br />
+Verdana</td>
+</tr><tr><td>generic fonts</td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td><span style="color: gray"><em>none</em></span></td>
+<td>serif<br />
+sans-serif<br />
+cursive<br />
+monospace<br />
+fantasy</td>
+</tr><tr><td>font size</td>
+<td>/Helvetica 20 selectfont</td>
+<td></td>
+<td>&lt;text x="100" y="100" font-size="36"&gt;<br /><span style="white-space: pre-wrap;">  </span>lorem ipsum<br />
+&lt;/text&gt;</td>
+</tr><tr><td>font weight</td>
+<td>/Helvetica-Bold 20 selectfont</td>
+<td></td>
+<td>&lt;text x="100" y="100" font-weight="bold"&gt;<br /><span style="white-space: pre-wrap;">  </span>lorem ipsum<br />
+&lt;/text&gt;</td>
+</tr><tr><td>font style</td>
+<td>/Helvetica-Oblique 20 selectfont</td>
+<td></td>
+<td></td>
+</tr><tr><td>text</td>
+<td>72 72 moveto (lorem ipsum) show</td>
+<td></td>
+<td>&lt;text x="100" y="100"&gt;<br /><span style="white-space: pre-wrap;">  </span>lorem ipsum<br />
+&lt;/text&gt;</td>
+</tr><tr><td>utf-8</td>
+<td><span style="color: gray"><em>PostScript is ASCII only. One can use octal backslash sequences to put upper 8-bit characters in strings. Each font has an encoding associated with it. There are also CID fonts for multibyte character encodings, but it is an advanced topic and requires extra software.</em></span></td>
+<td></td>
+<td><span style="color: gray"><em>at top of &lt;head&gt; element:</em></span><br />
+&lt;meta charset="UTF-8"&gt;</td>
+</tr><tr><td>text path</td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><th colspan="4"><a name="groups" id="groups"></a><a href="#groups-note">groups</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td>group</td>
+<td><span style="color: gray"><em>similar in function to gsave and grestore?</em></span></td>
+<td></td>
+<td>&lt;g id="group1" fill="red"&gt;<br /><span style="white-space: pre-wrap;">  </span>&lt;rect x="1cm" y="1cm"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>width="1cm" height="1cm"/&gt;<br /><span style="white-space: pre-wrap;">  </span>&lt;rect x="3cm" y="1cm"<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>width="1cm" height="1cm"/&gt;<br />
+&lt;/g&gt;</td>
+</tr><tr><td>definition</td>
+<td></td>
+<td></td>
+<td>&lt;defs&gt;<br /><span style="white-space: pre-wrap;">  </span>&lt;linearGradient id="Gradient01"&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>&lt;stop offset="20%" stop-color="#39F"/&gt;<br /><span style="white-space: pre-wrap;">  </span><span style="white-space: pre-wrap;">  </span>&lt;stop offset="90%" stop-color="#F3F"/&gt;<br /><span style="white-space: pre-wrap;">  </span>&lt;/linearGradient&gt;<br />
+&lt;/defs&gt;</td>
+</tr><tr><th colspan="4"><a name="masks-filters" id="masks-filters"></a><a href="#masks-filters-note">masks and filters</a></th>
+</tr><tr><th></th>
+<th><a href="#postscript">postscript</a></th>
+<th><a href="#processing">processing</a></th>
+<th><a href="#svg">svg</a></th>
+</tr><tr><td>clipping path</td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><td>opacity mask</td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><td>gaussian blur</td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><td>offset</td>
+<td></td>
+<td></td>
+<td></td>
+</tr><tr><th></th>
+<th><span style="color: #efefef"><span style="white-space: pre-wrap;">__________________________________________________________</span></span></th>
+<th><span style="color: #efefef"><span style="white-space: pre-wrap;">__________________________________________________________</span></span></th>
+<th><span style="color: #efefef"><span style="white-space: pre-wrap;">__________________________________________________________</span></span></th>
+</tr></table><p><a name="coordinates-note" id="coordinates-note"></a></p>
+<h1 id="toc0"><span><a href="#coordinates">Coordinates</a></span></h1>
+<p><a name="origin-note" id="origin-note"></a></p>
+<h2 id="toc1"><span><a href="#origin">origin</a></span></h2>
+<p><a name="unit-note" id="unit-note"></a></p>
+<h2 id="toc2"><span><a href="#unit">unit</a></span></h2>
+<p>In CSS, lengths the following units of length can be used:</p>
+<table class="wiki-content-table"><tr><th>abbrev</th>
+<th>unit</th>
+</tr><tr><td>in</td>
+<td>inch</td>
+</tr><tr><td>cm</td>
+<td>centimeter</td>
+</tr><tr><td>mm</td>
+<td>millimeter</td>
+</tr><tr><td>pc</td>
+<td>pica (6 to an inch)</td>
+</tr><tr><td>pt</td>
+<td>point (72 to an inch)</td>
+</tr><tr><td>px</td>
+<td>pixel</td>
+</tr></table><p>Pixels are used if the unit of length is not specified explicitly. High pixel density devices such as the Mac Retina display may nevertheless scale up the size of images specified in pixels.</p>
+<p><a name="paths-note" id="paths-note"></a></p>
+<h1 id="toc3"><span><a href="#paths">Paths</a></span></h1>
+<p><a name="shapes-note" id="shapes-note"></a></p>
+<h1 id="toc4"><span><a href="#shapes">Shapes</a></span></h1>
+<p><a name="color-note" id="color-note"></a></p>
+<h1 id="toc5"><span><a href="#color">Color</a></span></h1>
+<p><a name="text-note" id="text-note"></a></p>
+<h1 id="toc6"><span><a href="#text">Text</a></span></h1>
+<p>SVG text elements use the same font properties as are used in CSS.</p>
+<ul><li>font-family: Andale Mono | Arial | Arial Black | Comic Sans MS | Courier New | Georgia | Impact | Times New Roman | Trebuchet MS | Verdana</li>
+<li>font-family: serif | sans-serif | cursive | monospace | fantasy</li>
+<li>font-size:</li>
+<li>font-weight: normal | bold | bolder | lighter</li>
+<li>font-style: normal | italic | oblique</li>
+<li>font-variant: normal | small-caps</li>
+</ul><p>The first list of fonts are "Core fonts for the Web" which Microsoft made publicly available from 1996 to 2002.</p>
+<p>The second list of fonts are generic fonts. They define categories, and the user agent will select from an available font in the category.</p>
+<p>Font size, if not specified, will be in pixels.</p>
+<p>SVG provides a mechanism for telling the user agent where to download the font. It also has &lt;font&gt; and &lt;glyph&gt; tags for defining a font.</p>
+<p><a name="groups-note" id="groups-note"></a></p>
+<h1 id="toc7"><span><a href="#groups">Groups</a></span></h1>
+<p><a name="masks-filters-note" id="masks-filters-note"></a></p>
+<h1 id="toc8"><span><a href="#masks-filters">Masks and Filters</a></span></h1>
+<p><a name="postscript" id="postscript"></a></p>
+<h1 id="toc9"><span><a href="#top">PostScript</a></span></h1>
+<p><a href="http://partners.adobe.com/public/developer/en/ps/PLRM.pdf">PostScript Language Reference</a> (pdf)</p>
+<p><a name="processing" id="processing"></a></p>
+<h1 id="toc10"><span><a href="#top">Processing</a></span></h1>
+<p><a href="http://processing.org/">Processing 2</a></p>
+<p><a name="svg" id="svg"></a></p>
+<h1 id="toc11"><span><a href="#top">SVG</a></span></h1>
+<p><a href="http://www.w3.org/TR/SVG/">Scalable Vector Graphics (SVG) 1.1</a></p>
+
+                    </div>
+        </div>
+      </div>
+      <div id="license-area" class="license-area">
+        <a href="https://github.com/clarkgrubb/hyperpolyglot/issues">issue tracker</a> |
+        content of this page licensed under
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">
+        creative commons attribution-sharealike 3.0</a>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-17129977-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
