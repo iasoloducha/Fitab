@@ -13,6 +13,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const devProfessorCode = "PROF2024" // ONLY for local development
+
 type AuthHandler struct {
 	DB    *sql.DB
 	Store sessions.Store
@@ -33,12 +35,24 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Professors need a valid registration code
+// Professors need a valid registration code
 	if req.Role == "professor" {
 		expectedCode := os.Getenv("PROFESSOR_REGISTRATION_CODE")
+		isDevMode := os.Getenv("DEV_MODE") == "true"
+
+		// In development, use hardcoded fallback; in production, MUST be set
 		if expectedCode == "" {
-			expectedCode = "PROF2024" // fallback for development
+			if isDevMode {
+				expectedCode = devProfessorCode // Only for local testing
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "PROFESSOR_REGISTRATION_CODE not configured",
+					"code":  "CONFIG_MISSING",
+				})
+				return
+			}
 		}
+
 		if req.ProfessorCode != expectedCode {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "código de profesor inválido",
@@ -157,13 +171,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	session.Values[middleware.SessionUserID] = user.ID
 	session.Values[middleware.SessionUserRole] = user.Role
 	session.Values[middleware.SessionEmail] = user.Email
-	session.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 7, // 7 days
-		HttpOnly: true,
-		Secure:   false, // TODO: true in production with HTTPS
-		SameSite: http.SameSiteLaxMode,
-	}
 	session.Save(c.Request, c.Writer)
 
 	c.JSON(http.StatusOK, models.APIResponse{

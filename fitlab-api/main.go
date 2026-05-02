@@ -1,9 +1,12 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"fitlab-api/internal/database"
 	"fitlab-api/internal/handlers"
@@ -17,7 +20,9 @@ func main() {
 	// Configuration
 	dbPath := getEnv("DATABASE_PATH", "./fitlab.db")
 	addr := getEnv("ADDR", ":8080")
-	sessionSecret := getEnv("SESSION_SECRET", "change-me-in-production-super-secret-key")
+	sessionSecret := getEnv("SESSION_SECRET", generateRandomSecret())
+	allowedOrigins := getEnv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:8080")
+	isDevMode := getEnv("DEV_MODE", "true") == "true"
 
 	// Initialize database
 	db, err := database.New(dbPath)
@@ -35,7 +40,7 @@ func main() {
 		Path:     "/",
 		MaxAge:   86400 * 7, // 7 days
 		HttpOnly: true,
-		Secure:   false, // TODO: true in production
+		Secure:   !isDevMode, // true in production (HTTPS), false in development
 		SameSite: http.SameSiteLaxMode,
 	}
 
@@ -48,7 +53,7 @@ func main() {
 	r := gin.Default()
 
 	// CORS for frontend development
-	r.Use(corsMiddleware())
+	r.Use(corsMiddleware(allowedOrigins))
 
 	// API routes
 	api := r.Group("/api")
@@ -107,15 +112,28 @@ func main() {
 	}
 }
 
-// corsMiddleware allows frontend to call the API
-func corsMiddleware() gin.HandlerFunc {
+// corsMiddleware validates origin against whitelist
+func corsMiddleware(allowedOrigins string) gin.HandlerFunc {
+	// Parse allowed origins into a map for O(1) lookup
+	originMap := make(map[string]bool)
+	for _, o := range splitAndTrim(allowedOrigins, ",") {
+		originMap[o] = true
+	}
+
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		origin := c.Request.Header.Get("Origin")
+
+		// Check if origin is in whitelist
+		if originMap[origin] {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Access-Control-Allow-Credentials", "true")
+		}
+
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		c.Header("Access-Control-Allow-Credentials", "true")
 
 		if c.Request.Method == "OPTIONS" {
+			// Still allow preflight even if origin failed (browser needs the error response)
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
@@ -124,10 +142,30 @@ func corsMiddleware() gin.HandlerFunc {
 	}
 }
 
+// splitAndTrim splits a string by delimiter and trims whitespace
+func splitAndTrim(s, sep string) []string {
+	var result []string
+	for _, part := range strings.Split(s, sep) {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
+}
+
 // getEnv returns env var or default
 func getEnv(key, defaultVal string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
 	}
 	return defaultVal
+}
+
+// generateRandomSecret generates a random 32-byte secret for sessions
+func generateRandomSecret() string {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		log.Fatalf("Failed to generate random secret: %v", err)
+	}
+	return hex.EncodeToString(b)
 }
