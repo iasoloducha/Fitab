@@ -41,12 +41,19 @@ func main() {
 	// Initialize session store
 	store := sessions.NewCookieStore([]byte(sessionSecret))
 	var sessionStore sessions.Store = store
+
+    //Samesite dinamico segun el ambiente
+	sameSite := http.SameSiteLaxMode
+	if !isDevMode {
+		sameSite = http.SameSiteNoneMode
+	}
+	
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 7, // 7 days
 		HttpOnly: true,
 		Secure:   !isDevMode, // true in production (HTTPS), false in development
-		SameSite: http.SameSiteLaxMode,
+		SameSite: sameSite,
 	}
 
 	// Initialize handlers
