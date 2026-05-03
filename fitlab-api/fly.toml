@@ -1,0 +1,26 @@
+app = "fitlab-api"  # Cambiá este nombre si ya está usado (Fly.io requiere nombres únicos)
+primary_region = "mia"  # Miami, buena latencia para Argentina. Podés cambiar a "scl" (Santiago) si preferís
+
+[build]
+  # Fly.io detecta Go automáticamente desde go.mod
+
+[env]
+  DATABASE_PATH = "/data/fitlab.db"  # SQLite en volumen persistente
+  DEV_MODE = "false"
+  # REEMPLAZÁ este valor con tu URL real de Vercel (ej: https://fitlab-web.vercel.app)
+  ALLOWED_ORIGINS = "https://tu-fitlab-web.vercel.app"
+  PORT = "8080"  # Fly.io overridea esto con la variable PORT, pero dejamos un default
+
+[mounts]
+  # Volumen persistente para SQLite (NO se borra entre reinicios)
+  source = "fitlab_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false  # Free tier: no se duerme
+  min_machines_running = 1    # Mantiene 1 instancia corriendo
+
+[[vm]]
+  size = "shared-cpu-1x"  # 256MB RAM, elegible para free tier (hasta 3 VMs gratis)

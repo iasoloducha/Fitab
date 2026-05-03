@@ -19,7 +19,12 @@ import (
 func main() {
 	// Configuration
 	dbPath := getEnv("DATABASE_PATH", "./fitlab.db")
+	// Fly.io provides PORT env var; fallback to ADDR then default :8080
+	port := getEnv("PORT", "")
 	addr := getEnv("ADDR", ":8080")
+	if port != "" {
+		addr = ":" + port
+	}
 	sessionSecret := getEnv("SESSION_SECRET", generateRandomSecret())
 	allowedOrigins := getEnv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:8080")
 	isDevMode := getEnv("DEV_MODE", "true") == "true"
