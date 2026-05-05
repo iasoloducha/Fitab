@@ -76,6 +76,13 @@ export const api = {
   progress: {
     get: (userId) => request(`/progress${userId ? `?user_id=${userId}` : ''}`),
   },
+  
+  admin: {
+    login: (data) => request('/admin/login', { method: 'POST', body: data }),
+    getUsers: () => request('/admin/users'),
+    updateUser: (id, data) => request(`/admin/users/${id}`, { method: 'PUT', body: data }),
+    deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
+  },
 }
 
 export { ApiError }

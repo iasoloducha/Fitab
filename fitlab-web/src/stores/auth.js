@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: (state) => !!state.user,
     isProfessor: (state) => state.user?.role === 'professor',
     isStudent: (state) => state.user?.role === 'student',
+    isAdmin: (state) => state.user?.role === 'admin',
   },
   
   actions: {
@@ -63,6 +64,22 @@ export const useAuthStore = defineStore('auth', {
         this.user = response.data
       } catch (err) {
         this.user = null
+      }
+    },
+    
+    async adminLogin(email, password) {
+      this.loading = true
+      this.error = null
+      
+      try {
+        const response = await api.admin.login({ email, password })
+        this.user = response.data
+        return true
+      } catch (err) {
+        this.error = err.message
+        return false
+      } finally {
+        this.loading = false
       }
     },
   },

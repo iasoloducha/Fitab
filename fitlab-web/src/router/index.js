@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import AdminLoginView from '../views/AdminLoginView.vue'
+import AdminDashboardView from '../views/AdminDashboardView.vue'
 import AppLayout from '../views/AppLayout.vue'
 import RoutinesView from '../views/RoutinesView.vue'
 import RoutineView from '../views/RoutineView.vue'
@@ -26,6 +28,17 @@ const routes = [
     path: '/register',
     name: 'register',
     component: RegisterView,
+  },
+  {
+    path: '/admin/login',
+    name: 'admin-login',
+    component: AdminLoginView,
+  },
+  {
+    path: '/admin/dashboard',
+    name: 'admin-dashboard',
+    component: AdminDashboardView,
+    meta: { requiresAuth: true },
   },
   {
     path: '/app',

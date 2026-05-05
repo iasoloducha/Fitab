@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
@@ -81,4 +83,58 @@ func GetUserRole(c *gin.Context) string {
 		return ""
 	}
 	return v
+}
+
+// AdminMiddleware checks if the authenticated user is an admin
+func AdminMiddleware(store sessions.Store) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// First run auth middleware to ensure session is valid
+		session, err := store.Get(c.Request, SessionName)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "sesión inválida",
+				"code":  "UNAUTHORIZED",
+			})
+			return
+		}
+
+		userID, ok := session.Values[SessionUserID].(int64)
+		if !ok || userID == 0 {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "debes iniciar sesión",
+				"code":  "UNAUTHORIZED",
+			})
+			return
+		}
+
+		// Check if user email is in ADMIN_EMAILS
+		email, _ := session.Values[SessionEmail].(string)
+		adminEmails := os.Getenv("ADMIN_EMAILS")
+		
+		isAdmin := false
+		if adminEmails != "" {
+			emails := strings.Split(adminEmails, ",")
+			for _, e := range emails {
+				if strings.TrimSpace(e) == email {
+					isAdmin = true
+					break
+				}
+			}
+		}
+
+		if !isAdmin {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": "acceso denegado: se requiere admin",
+				"code":  "FORBIDDEN",
+			})
+			return
+		}
+
+		// Store admin info in context
+		c.Set(SessionUserID, userID)
+		c.Set(SessionUserRole, "admin")
+		c.Set(SessionEmail, email)
+
+		c.Next()
+	}
 }

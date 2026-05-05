@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"os"
+	"strings"
 
 	"fitlab-api/internal/middleware"
 	"fitlab-api/internal/models"
@@ -220,7 +221,7 @@ func (h *AuthHandler) GetStudents(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "error al obtener estudiantes",
-			"code":  "INTERNAL_ERROR",
+			"code": "INTERNAL_ERROR",
 		})
 		return
 	}
@@ -238,5 +239,86 @@ func (h *AuthHandler) GetStudents(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse{
 		Data:  students,
 		Total: len(students),
+	})
+}
+
+// AdminLogin authenticates an admin user based on ADMIN_EMAILS env var
+func (h *AuthHandler) AdminLogin(c *gin.Context) {
+	var req models.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Error: "email y contraseña son requeridos",
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// Check if email is in ADMIN_EMAILS
+	adminEmails := os.Getenv("ADMIN_EMAILS")
+	if adminEmails == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "ADMIN_EMAILS not configured",
+			"code":  "CONFIG_MISSING",
+		})
+		return
+	}
+
+	emailIsAdmin := false
+	emails := strings.Split(adminEmails, ",")
+	for _, e := range emails {
+		if strings.TrimSpace(e) == req.Email {
+			emailIsAdmin = true
+			break
+		}
+	}
+
+	if !emailIsAdmin {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "este email no tiene permisos de admin",
+			"code":  "NOT_ADMIN",
+		})
+		return
+	}
+
+	// Find user
+	var user models.User
+	err := h.DB.QueryRow(
+		"SELECT id, email, password_hash, name, role, created_at FROM users WHERE email = ?",
+		req.Email,
+	).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.Role, &user.CreatedAt)
+
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "email o contraseña incorrectos",
+			"code":  "INVALID_CREDENTIALS",
+		})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "error interno",
+			"code":  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Check password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "email o contraseña incorrectos",
+			"code":  "INVALID_CREDENTIALS",
+		})
+		return
+	}
+
+	// Create session with admin role
+	session, _ := h.Store.Get(c.Request, middleware.SessionName)
+	session.Values[middleware.SessionUserID] = user.ID
+	session.Values[middleware.SessionUserRole] = "admin"
+	session.Values[middleware.SessionEmail] = req.Email
+	session.Save(c.Request, c.Writer)
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Data: user,
 	})
 }

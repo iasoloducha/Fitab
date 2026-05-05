@@ -58,6 +58,7 @@ func main() {
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(db.DB, sessionStore)
+	adminHandler := handlers.NewAdminHandler(db.DB)
 	routineHandler := handlers.NewRoutineHandler(db.DB)
 	exerciseHandler := handlers.NewExerciseHandler(db.DB)
 
@@ -111,6 +112,18 @@ func main() {
 			protected.DELETE("/logs/:id", exerciseHandler.DeleteLog)
 			protected.GET("/progress", exerciseHandler.GetProgress)
 		}
+	}
+
+	// Admin routes (public login)
+	api.POST("/admin/login", authHandler.AdminLogin)
+
+	// Admin protected routes
+	admin := api.Group("/admin")
+	admin.Use(middleware.AdminMiddleware(sessionStore))
+	{
+		admin.GET("/users", adminHandler.ListUsers)
+		admin.PUT("/users/:id", adminHandler.UpdateUserName)
+ 		admin.DELETE("/users/:id", adminHandler.DeleteUser)
 	}
 
 	// Health check
