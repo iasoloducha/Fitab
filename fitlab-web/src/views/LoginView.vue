@@ -40,6 +40,11 @@
         ¿No tenés cuenta? 
         <router-link to="/register">Registrate</router-link>
       </p>
+      
+      <p class="auth-link">
+        ¿Olvidaste tu contraseña? 
+        <router-link to="/forgot-password">Recuperála</router-link>
+      </p>
     </div>
   </div>
 </template>

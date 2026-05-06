@@ -50,6 +50,7 @@ export const api = {
     login: (data) => request('/auth/login', { method: 'POST', body: data }),
     logout: () => request('/auth/logout', { method: 'POST' }),
     me: () => request('/auth/me'),
+    forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: { email } }),
   },
   
   routines: {

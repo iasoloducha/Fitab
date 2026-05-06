@@ -41,68 +41,16 @@ fitlab/
 - Contacto y ubicación
 
 ### App (Backend)
-- **Auth**: Registro/Login con sesiones
+- **Auth**: Registro/Login con sesiones, recuperación de contraseña
+- **Admin Dashboard**: Login especial para administración
 - **Rutinas**: CRUD completas
 - **Ejercicios**: Con peso, series, repeticiones
 - **Tracking**: Alumnos marcan ejercicios completados
 - **Progreso**: Historial de sesiones
 
-## Inicio Rápido
-
-### Backend
-
-```bash
-cd fitlab-api
-go run .
-# Server en http://localhost:8080
-```
-
-### Frontend
-
-```bash
-cd fitlab-web
-npm install
-npm run dev
-# App en http://localhost:5173
-```
-
-### Production
-
-```bash
-# Backend
-cd fitlab-api
-go build -o fitlab-api
-./fitlab-api
-
-# Frontend
-cd fitlab-web
-npm run build
-# Servir dist/ con nginx/caddy
-```
-
-## Variables de Entorno
-
-| Variable                      | Default                                | Descripción                     |
-|-------------------------------|---------------------------------------|--------------------------------|
-| `ADDR`                        | `:8080`                                | Dirección del server            |
-| `DATABASE_PATH`               | `./fitlab.db`                          | Path a SQLite                   |
-| `SESSION_SECRET`              | *(auto-generado)*                       | Clave sesiones (se genera si no se setea) |
-| `PROFESSOR_REGISTRATION_CODE` | *(requerido en prod)*               | Código para registar profesores |
-| `ALLOWED_ORIGINS`            | `localhost:5173,localhost:8080`        | Origins permitidos para CORS    |
-| `DEV_MODE`                  | `true`                                | `true`=dev, `false`=prod   |
-
-### Desarrollo (DEV_MODE=true)
-- CORS permite `localhost:5173` y `localhost:8080`
-- Session secret se auto-genera cada inicio
-- Código de profesor usa fallback `"PROF2024"`
-
-### Producción (DEV_MODE=false)
-- Configurar `ALLOWED_ORIGINS` con el dominio real
-- `SESSION_SECRET` debe estar configurado
-- `PROFESSOR_REGISTRATION_CODE` debe estar configurado
-
 ## Roles
 
+- **Admin**: Gestión de usuarios (configurado via `ADMIN_EMAILS`)
 - **Profesor**: Crea y asigna rutinas a alumnos
 - **Alumno**: Ve sus rutinas, marca ejercicios completados
 
@@ -113,6 +61,7 @@ npm run build
 | POST | `/api/auth/register` | - | Registro |
 | POST | `/api/auth/login` | - | Login |
 | POST | `/api/auth/logout` | ✓ | Logout |
+| POST | `/api/auth/forgot-password` | - | Recuperar contraseña |
 | GET  | `/api/auth/me` | ✓ | Usuario actual |
 | GET  | `/api/routines` | ✓ | Listar rutinas |
 | POST | `/api/routines` | Prof | Crear rutina |
@@ -127,7 +76,7 @@ npm run build
 - Go 1.21+
 - Gin (web framework)
 - gorilla/sessions (auth)
-- mattn/go-sqlite3 (database)
+- modernc/sqlite (database sin CGO)
 - bcrypt (passwords)
 
 ### Frontend
@@ -135,6 +84,21 @@ npm run build
 - Vue Router 4
 - Pinia 2 (state)
 - Vite 5
+
+## Deployment
+
+### Backend (Fly.io)
+```bash
+cd fitlab-api
+fly deploy
+fly secrets set SMTP_HOST=smtp.gmail.com SMTP_PORT=587 SMTP_USER=tu@email.com SMTP_PASS=app-password SMTP_FROM="Fitlab <tu@email.com>"
+```
+
+### Frontend (Vercel)
+```bash
+cd fitlab-web
+vercel --prod
+```
 
 ---
 
