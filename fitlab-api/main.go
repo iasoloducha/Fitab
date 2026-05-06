@@ -74,6 +74,7 @@ func main() {
 		// Public auth routes
 		api.POST("/auth/register", authHandler.Register)
 		api.POST("/auth/login", authHandler.Login)
+		api.POST("/auth/forgot-password", authHandler.ForgotPassword)
 
 		// Protected routes
 		protected := api.Group("")

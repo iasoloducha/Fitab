@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -188,6 +190,95 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, models.APIResponse{
 		Data: gin.H{"message": "sesión cerrada"},
 	})
+}
+
+// ForgotPassword handles password recovery requests
+func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Error: "email requerido",
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// Check if user exists
+	var userID int64
+	var userEmail, userName string
+	err := h.DB.QueryRow(
+		"SELECT id, email, name FROM users WHERE email = ?",
+		req.Email,
+	).Scan(&userID, &userEmail, &userName)
+
+	if err == sql.ErrNoRows {
+		// Don't reveal whether email exists - return generic success
+		c.JSON(http.StatusOK, models.APIResponse{
+			Data: gin.H{"message": "Si el email está registrado, te hemos enviado las instrucciones"},
+		})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error interno",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Generate random 8-character password
+	tempPassword := generateRandomPassword(8)
+
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(tempPassword), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al procesar contraseña",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Update user's password
+	_, err = h.DB.Exec("UPDATE users SET password_hash = ? WHERE id = ?", string(hashedPassword), userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al actualizar contraseña",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Send recovery email
+	err = SendRecoveryEmail(userEmail, tempPassword)
+	if err != nil {
+		// Log error but don't reveal to user
+		fmt.Printf("ERROR sending recovery email: %v\n", err)
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Data: gin.H{"message": "Si el email está registrado, te hemos enviado las instrucciones"},
+	})
+}
+
+// generateRandomPassword generates a cryptographically secure random password
+func generateRandomPassword(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, length)
+	_, err := rand.Read(b)
+	if err != nil {
+		// Fallback to simple random
+		for i := range b {
+			b[i] = charset[i%len(charset)]
+		}
+		return string(b)
+	}
+	for i := range b {
+		b[i] = charset[int(b[i])%len(charset)]
+	}
+	return string(b)
 }
 
 // Me returns the current user info
