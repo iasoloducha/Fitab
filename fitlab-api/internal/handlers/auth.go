@@ -304,6 +304,67 @@ func (h *AuthHandler) Me(c *gin.Context) {
 	})
 }
 
+// ChangePassword allows a logged-in user to change their password
+func (h *AuthHandler) ChangePassword(c *gin.Context) {
+	userID := middleware.GetUserID(c)
+
+	var req struct {
+		CurrentPassword string `json:"current_password" binding:"required"`
+		NewPassword    string `json:"new_password" binding:"required,min=6"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Error: "password actual y nuevo password son requeridos",
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// Get user's current hashed password
+	var storedHash string
+	err := h.DB.QueryRow("SELECT password_hash FROM users WHERE id = ?", userID).Scan(&storedHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error interno",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Verify current password
+	if err := bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(req.CurrentPassword)); err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Error: "password actual incorrecta",
+			Code:  "INVALID_PASSWORD",
+		})
+		return
+	}
+
+	// Hash new password
+	newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al procesar password",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Update password
+	_, err = h.DB.Exec("UPDATE users SET password_hash = ? WHERE id = ?", string(newHash), userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al actualizar password",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Data: gin.H{"message": "password actualizado"},
+	})
+}
+
 // GetStudents returns all students (for professors to assign routines)
 func (h *AuthHandler) GetStudents(c *gin.Context) {
 	rows, err := h.DB.Query(

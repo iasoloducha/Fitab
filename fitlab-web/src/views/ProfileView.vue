@@ -23,14 +23,57 @@
         <p>{{ formatDate(auth.user?.created_at) }}</p>
       </div>
     </div>
+
+    <h2 class="section-title">Cambiar Contraseña</h2>
+    
+    <div class="profile-card">
+      <div v-if="passwordMessage" class="success">{{ passwordMessage }}</div>
+      <div v-if="passwordError" class="error">{{ passwordError }}</div>
+      
+      <form @submit.prevent="changePassword">
+        <div class="form-group">
+          <label for="current-password">Contraseña Actual</label>
+          <input 
+            type="password" 
+            id="current-password" 
+            v-model="currentPassword" 
+            required 
+            placeholder="Tu contraseña actual"
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="new-password">Nueva Contraseña</label>
+          <input 
+            type="password" 
+            id="new-password" 
+            v-model="newPassword" 
+            required 
+            minlength="6"
+            placeholder="Mínimo 6 caracteres"
+          />
+        </div>
+        
+        <button type="submit" class="btn btn-primary" :disabled="loadingPassword">
+          {{ loadingPassword ? 'Cambiando...' : 'Cambiar Contraseña' }}
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { api } from '../api'
 
 const auth = useAuthStore()
+
+const currentPassword = ref('')
+const newPassword = ref('')
+const loadingPassword = ref(false)
+const passwordMessage = ref('')
+const passwordError = ref('')
 
 // Fetch user data if not already loaded (e.g., on direct navigation)
 onMounted(async () => {
@@ -38,6 +81,23 @@ onMounted(async () => {
     await auth.fetchMe()
   }
 })
+
+async function changePassword() {
+  loadingPassword.value = true
+  passwordMessage.value = ''
+  passwordError.value = ''
+  
+  try {
+    await api.auth.changePassword(currentPassword.value, newPassword.value)
+    passwordMessage.value = 'Contraseña cambiada correctamente'
+    currentPassword.value = ''
+    newPassword.value = ''
+  } catch (err) {
+    passwordError.value = err.message
+  } finally {
+    loadingPassword.value = false
+  }
+}
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -56,6 +116,11 @@ function formatDate(dateStr) {
 
 .profile-view h2 {
   color: var(--color-primary);
+}
+
+.section-title {
+  color: var(--color-primary);
+  margin-top: 2rem;
 }
 
 .profile-card {
@@ -86,5 +151,74 @@ function formatDate(dateStr) {
   margin: 0;
   font-weight: 600;
   color: white;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: white;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-dark);
+}
+
+.btn-primary:hover {
+  background: #ff8c00;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.error {
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  color: #ff4444;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 </style>

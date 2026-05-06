@@ -51,6 +51,7 @@ export const api = {
     logout: () => request('/auth/logout', { method: 'POST' }),
     me: () => request('/auth/me'),
     forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: { email } }),
+    changePassword: (currentPassword, newPassword) => request('/auth/password', { method: 'PUT', body: { current_password: currentPassword, new_password: newPassword } }),
   },
   
   routines: {

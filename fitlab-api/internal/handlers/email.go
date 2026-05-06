@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/smtp"
 	"os"
@@ -46,33 +47,59 @@ func SendRecoveryEmail(toEmail, tempPassword string) error {
 
 	// Build email
 	subject := "Recuperación de contraseña - Fitlab"
-	body := fmt.Sprintf(`From: %s <%s>
-To: %s
-Subject: %s
-
-Hola,
-
-Tu contraseña temporal es: %s
-
-Ingresá con esta contraseña y luego podés cambiarla desde tu perfil.
-
-Si no solicitaste este cambio, ignorá este email.
-
-Saludos,
-Equipo Fitlab
-`, fromName, cfg.User, toEmail, subject, tempPassword)
+	body := fmt.Sprintf("From: %s <%s>\r\nTo: %s\r\nSubject: %s\r\n\r\nHola,\r\n\r\nTu contraseña temporal es: %s\r\n\r\nIngresá con esta contraseña y luego podés cambiarla desde tu perfil.\r\n\r\nSaludos,\r\nEquipo Fitlab\r\n", fromName, cfg.User, toEmail, subject, tempPassword)
 
 	// Connect to SMTP server
 	addr := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
-	
-	// Use TLS for connection
+
+	// Create TLS config that skips verification (for known hosts like Gmail)
+	tlsConfig := &tls.Config{
+		ServerName:         cfg.Host,
+		InsecureSkipVerify: false,
+	}
+
+	// Connect and upgrade to TLS
+	conn, err := smtp.Dial(addr)
+	if err != nil {
+		return fmt.Errorf("error connecting to SMTP: %v", err)
+	}
+
+	// Start TLS
+	if err = conn.StartTLS(tlsConfig); err != nil {
+		return fmt.Errorf("error starting TLS: %v", err)
+	}
+
+	// Authenticate
 	auth := smtp.PlainAuth("", cfg.User, cfg.Pass, cfg.Host)
+	if err = conn.Auth(auth); err != nil {
+		return fmt.Errorf("error authenticating: %v", err)
+	}
 
 	// Send email
-	err := smtp.SendMail(addr, auth, cfg.User, []string{toEmail}, []byte(body))
-	if err != nil {
-		return fmt.Errorf("error sending email: %v", err)
+	if err = conn.Mail(cfg.User); err != nil {
+		return fmt.Errorf("error setting sender: %v", err)
 	}
+
+	if err = conn.Rcpt(toEmail); err != nil {
+		return fmt.Errorf("error setting recipient: %v", err)
+	}
+
+	w, err := conn.Data()
+	if err != nil {
+		return fmt.Errorf("error creating data stream: %v", err)
+	}
+
+	_, err = w.Write([]byte(body))
+	if err != nil {
+		return fmt.Errorf("error writing email: %v", err)
+	}
+
+	err = w.Close()
+	if err != nil {
+		return fmt.Errorf("error closing data stream: %v", err)
+	}
+
+	conn.Quit()
 
 	return nil
 }

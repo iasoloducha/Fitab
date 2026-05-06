@@ -83,6 +83,7 @@ func main() {
 			// Auth
 			protected.POST("/auth/logout", authHandler.Logout)
 			protected.GET("/auth/me", authHandler.Me)
+			protected.PUT("/auth/password", authHandler.ChangePassword)
 
 			// Routines
 			protected.GET("/routines", routineHandler.List)

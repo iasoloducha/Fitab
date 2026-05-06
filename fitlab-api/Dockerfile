@@ -1,4 +1,4 @@
-ARG GO_VERSION=1
+ARG GO_VERSION=1.21
 FROM golang:${GO_VERSION}-bookworm as builder
 
 WORKDIR /usr/src/app
@@ -9,6 +9,11 @@ RUN go build -v -o /run-app .
 
 
 FROM debian:bookworm
+
+# Install CA certificates for TLS email sending
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /run-app /usr/local/bin/
 CMD ["run-app"]
