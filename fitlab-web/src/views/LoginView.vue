@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -59,6 +59,10 @@ const router = useRouter()
 
 const email = ref('')
 const password = ref('')
+
+onMounted(() => {
+  auth.error = null
+})
 
 async function handleLogin() {
   const success = await auth.login(email.value, password.value)

@@ -276,15 +276,18 @@ onMounted(async () => {
   
   if (auth.isStudent) {
     const today = new Date().toISOString().split('T')[0]
-    for (const ex of routine.value?.exercises || []) {
-      try {
-        const response = await api.logs.list(ex.id)
-        const logs = response.data || []
-        if (logs.some(log => log.date === today && log.completed)) {
-          completedToday.value.push(ex.id)
-        }
-      } catch {}
-    }
+    // Parallelize all log fetch requests to avoid N+1 sequential calls
+    await Promise.all(
+      (routine.value?.exercises || []).map(async (ex) => {
+        try {
+          const response = await api.logs.list(ex.id)
+          const logs = response.data || []
+          if (logs.some(log => log.date === today && log.completed)) {
+            completedToday.value.push(ex.id)
+          }
+        } catch {}
+      })
+    )
   }
 })
 

@@ -91,6 +91,8 @@
             />
           </div>
           
+          <div v-if="copyError" class="error">{{ copyError }}</div>
+          
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" @click="closeCopyModal">
               Cancelar
@@ -134,6 +136,7 @@ const routines = useRoutineStore()
 const showCopyModal = ref(false)
 const copyRoutine = ref(null)
 const copying = ref(false)
+const copyError = ref('')
 
 const showDeleteModal = ref(false)
 const deleteRoutineData = ref(null)
@@ -168,9 +171,11 @@ function closeDeleteModal() {
 
 async function confirmDelete() {
   deleting.value = true
-  await routines.deleteRoutine(deleteRoutineData.value.id)
+  const success = await routines.deleteRoutine(deleteRoutineData.value.id)
   deleting.value = false
-  closeDeleteModal()
+  if (success) {
+    closeDeleteModal()
+  }
 }
 
 async function toggleActive(id, isActive) {
@@ -191,6 +196,7 @@ function closeCopyModal() {
 
 async function handleCopy() {
   copying.value = true
+  copyError.value = ''
   const result = await routines.copyRoutine(copyRoutine.value.id, {
     target_user_id: copyForm.target_user_id,
     title: copyForm.title || undefined,
@@ -199,6 +205,8 @@ async function handleCopy() {
   
   if (result) {
     closeCopyModal()
+  } else if (routines.error) {
+    copyError.value = 'Error al copiar rutina'
   }
 }
 </script>

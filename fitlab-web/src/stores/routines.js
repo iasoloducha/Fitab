@@ -68,8 +68,10 @@ export const useRoutineStore = defineStore('routines', {
       try {
         await api.routines.delete(id)
         await this.fetchRoutines()
+        return true
       } catch (err) {
         this.error = err.message
+        return false
       }
     },
     
@@ -85,13 +87,20 @@ export const useRoutineStore = defineStore('routines', {
     },
     
     async toggleActive(id, isActive) {
+      // Save previous state for rollback
+      const routine = this.routines.find(r => r.id === id)
+      if (!routine) return
+      
+      const previousState = routine.is_active
+      
+      // Optimistic update
+      routine.is_active = isActive
+      
       try {
         await api.routines.update(id, { is_active: isActive })
-        const routine = this.routines.find(r => r.id === id)
-        if (routine) {
-          routine.is_active = isActive
-        }
       } catch (err) {
+        // Rollback on failure
+        routine.is_active = previousState
         this.error = err.message
       }
     },

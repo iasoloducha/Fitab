@@ -4,7 +4,7 @@
     <p class="subtitle">Gestión de Usuarios</p>
 
     <div class="toolbar">
-      <button class="btn btn-tool" @click="handleBackup">📥 Backup</button>
+      <button class="btn btn-tool" :disabled="backingUp" @click="handleBackup">{{ backingUp ? 'Generando...' : '📥 Backup' }}</button>
       <button class="btn btn-tool" @click="openRestoreModal">📤 Restore</button>
     </div>
 
@@ -121,6 +121,7 @@ const userToEdit = ref(null)
 const userToDelete = ref(null)
 const selectedFile = ref(null)
 const restoring = ref(false)
+const backingUp = ref(false)
 
 onMounted(async () => {
   await adminStore.fetchUsers()
@@ -169,8 +170,16 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('es-AR')
 }
 
-function handleBackup() {
-  api.admin.backup()
+async function handleBackup() {
+  if (backingUp.value) return
+  backingUp.value = true
+  try {
+    await api.admin.backup()
+  } catch (err) {
+    adminStore.error = err.message || 'Error al generar backup'
+  } finally {
+    backingUp.value = false
+  }
 }
 
 function openRestoreModal() {

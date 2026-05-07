@@ -56,7 +56,8 @@ async function handleForgotPassword() {
     // Always show same message to not reveal if email exists
     message.value = 'Si el email está registrado, te hemos enviado las instrucciones'
   } catch (err) {
-    error.value = err.message
+    // Always show generic message regardless of error type
+    error.value = 'Si el email está registrado, te hemos enviado las instrucciones'
   } finally {
     loading.value = false
   }

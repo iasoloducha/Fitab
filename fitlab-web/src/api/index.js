@@ -86,9 +86,24 @@ export const api = {
     updateUser: (id, data) => request(`/admin/users/${id}`, { method: 'PUT', body: data }),
     deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
     backup: () => {
-      const token = document.cookie.replace(/(?:(?:^|.*;\s*)session\s*=\s*([^;]*).*$)|^.*$/, '$1')
       const url = `${API_BASE}/admin/backup`
-      window.location.href = url
+      return fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+      }).then(res => {
+        if (!res.ok) {
+          return res.json().then(data => {
+            throw new Error(data.error || 'Error al generar backup')
+          })
+        }
+        return res.blob()
+      }).then(blob => {
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = `fitlab-backup-${new Date().toISOString().split('T')[0]}.json`
+        link.click()
+        URL.revokeObjectURL(link.href)
+      })
     },
     restore: (file) => {
       const formData = new FormData()
