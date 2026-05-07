@@ -102,6 +102,7 @@ func main() {
 				professor.POST("/routines", routineHandler.Create)
 				professor.PUT("/routines/:id", routineHandler.Update)
 				professor.DELETE("/routines/:id", routineHandler.Delete)
+				professor.POST("/routines/:id/copy", routineHandler.Copy)
 				professor.POST("/routines/:id/exercises", exerciseHandler.Create)
 				professor.PUT("/exercises/:id", exerciseHandler.Update)
 				professor.DELETE("/exercises/:id", exerciseHandler.Delete)

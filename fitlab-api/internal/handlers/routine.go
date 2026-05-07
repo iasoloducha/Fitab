@@ -364,6 +364,162 @@ func (h *RoutineHandler) Delete(c *gin.Context) {
 	})
 }
 
+// Copy creates a copy of an existing routine for another user
+func (h *RoutineHandler) Copy(c *gin.Context) {
+	routineID := c.Param("id")
+
+	// Verify user is a professor
+	if middleware.GetUserRole(c) != "professor" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "solo profesores pueden copiar rutinas"})
+		return
+	}
+
+	var req models.CopyRoutineRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "datos inválidos",
+			"code":  "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// Verify source routine exists
+	var sourceRoutine models.Routine
+	var sourceCreatedBy sql.NullInt64
+	var sourceStartDate, sourceEndDate sql.NullString
+	var sourceTitle string
+	var sourceIsActive bool
+
+	err := h.DB.QueryRow(`
+		SELECT id, user_id, created_by, title, start_date, end_date, is_active
+		FROM routines WHERE id = ?`,
+		routineID,
+	).Scan(&sourceRoutine.ID, &sourceRoutine.UserID, &sourceCreatedBy, &sourceTitle, &sourceStartDate, &sourceEndDate, &sourceIsActive)
+
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, gin.H{"error": "rutina no encontrada"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error interno"})
+		return
+	}
+
+	// Use provided title or default to source title + "(copia)"
+	title := req.Title
+	if title == "" {
+		title = sourceTitle + " (copia)"
+	}
+
+	// Verify target user exists and is a student
+	var targetUserRole string
+	err = h.DB.QueryRow("SELECT role FROM users WHERE id = ?", req.TargetUserID).Scan(&targetUserRole)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "alumno no encontrado"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error interno"})
+		return
+	}
+	if targetUserRole != "student" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "solo se puede copiar a alumnos"})
+		return
+	}
+
+	// Get source exercises
+	exerciseRows, err := h.DB.Query(`
+		SELECT day_number, name, sets, reps, weight_kg, observations, sort_order
+		FROM exercises WHERE routine_id = ?
+		ORDER BY day_number, sort_order`,
+		routineID,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al obtener ejercicios"})
+		return
+	}
+	defer exerciseRows.Close()
+
+	var exercises []struct {
+		DayNumber    int
+		Name         string
+		Sets         int
+		Reps         string
+		WeightKg    string
+		Observations string
+		SortOrder    int
+	}
+
+	for exerciseRows.Next() {
+		var e struct {
+			DayNumber    int
+			Name         string
+			Sets         int
+			Reps         string
+			WeightKg    string
+			Observations string
+			SortOrder    int
+		}
+		var weightKg, observations sql.NullString
+		if err := exerciseRows.Scan(&e.DayNumber, &e.Name, &e.Sets, &e.Reps, &weightKg, &observations, &e.SortOrder); err != nil {
+			continue
+		}
+		if weightKg.Valid {
+			e.WeightKg = weightKg.String
+		}
+		if observations.Valid {
+			e.Observations = observations.String
+		}
+		exercises = append(exercises, e)
+	}
+
+	// Create new routine with exercises in a transaction
+	tx, err := h.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al copiar rutina"})
+		return
+	}
+	defer tx.Rollback()
+
+	userID := middleware.GetUserID(c)
+	result, err := tx.Exec(`
+		INSERT INTO routines (user_id, created_by, title, start_date, end_date, is_active)
+		VALUES (?, ?, ?, ?, ?, ?)`,
+		req.TargetUserID, userID, title,
+		nullString(sourceStartDate.String),
+		nullString(sourceEndDate.String),
+		sourceIsActive,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al copiar rutina"})
+		return
+	}
+
+	newRoutineID, _ := result.LastInsertId()
+
+	// Copy all exercises
+	for _, ex := range exercises {
+		_, err = tx.Exec(`
+			INSERT INTO exercises (routine_id, day_number, name, sets, reps, weight_kg, observations, sort_order)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+			newRoutineID, ex.DayNumber, ex.Name, ex.Sets, ex.Reps, ex.WeightKg, ex.Observations, ex.SortOrder,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error al copiar ejercicios"})
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al copiar rutina"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.APIResponse{
+		Data: gin.H{"id": newRoutineID, "message": "rutina copiada exitosamente"},
+	})
+}
+
 // Helper: convert empty string to nil
 func nullString(s string) sql.NullString {
 	if s == "" {

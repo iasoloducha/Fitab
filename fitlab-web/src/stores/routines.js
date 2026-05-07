@@ -73,6 +73,17 @@ export const useRoutineStore = defineStore('routines', {
       }
     },
     
+    async copyRoutine(id, data) {
+      try {
+        const response = await api.routines.copy(id, data)
+        await this.fetchRoutines()
+        return response.data
+      } catch (err) {
+        this.error = err.message
+        return null
+      }
+    },
+    
     async toggleActive(id, isActive) {
       try {
         await api.routines.update(id, { is_active: isActive })

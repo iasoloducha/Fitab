@@ -114,6 +114,11 @@ type LogExerciseRequest struct {
 	Notes       string `json:"notes,omitempty"`
 }
 
+type CopyRoutineRequest struct {
+	TargetUserID int64  `json:"target_user_id" binding:"required"`
+	Title        string `json:"title,omitempty"`
+}
+
 type APIResponse struct {
 	Data  any    `json:"data,omitempty"`
 	Error string `json:"error,omitempty"`

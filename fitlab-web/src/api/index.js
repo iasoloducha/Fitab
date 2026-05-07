@@ -60,6 +60,7 @@ export const api = {
     create: (data) => request('/routines', { method: 'POST', body: data }),
     update: (id, data) => request(`/routines/${id}`, { method: 'PUT', body: data }),
     delete: (id) => request(`/routines/${id}`, { method: 'DELETE' }),
+    copy: (id, data) => request(`/routines/${id}/copy`, { method: 'POST', body: data }),
     addExercise: (routineId, data) => request(`/routines/${routineId}/exercises`, { method: 'POST', body: data }),
     updateExercise: (exerciseId, data) => request(`/exercises/${exerciseId}`, { method: 'PUT', body: data }),
     deleteExercise: (exerciseId) => request(`/exercises/${exerciseId}`, { method: 'DELETE' }),
