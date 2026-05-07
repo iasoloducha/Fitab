@@ -2,7 +2,11 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"time"
 
 	"fitlab-api/internal/models"
 
@@ -138,5 +142,115 @@ func (h *AdminHandler) DeleteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, models.APIResponse{
 		Data: gin.H{"message": "Usuario eliminado"},
+	})
+}
+
+// Backup downloads a copy of the database
+func (h *AdminHandler) Backup(c *gin.Context) {
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "./fitlab.db"
+	}
+
+	// Check if file exists
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "base de datos no encontrada",
+			Code:  "NOT_FOUND",
+		})
+		return
+	}
+
+	// Open the database file
+	file, err := os.Open(dbPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al leer la base de datos",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+	defer file.Close()
+
+	// Generate filename with timestamp
+	timestamp := time.Now().Format("2006-01-02_15-04-05")
+	filename := fmt.Sprintf("fitlab-backup-%s.db", timestamp)
+
+	// Set headers for file download
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	c.Header("Content-Type", "application/octet-stream")
+
+	// Copy file content to response
+	_, err = io.Copy(c.Writer, file)
+	if err != nil {
+		// Log error but don't fail (response already sent)
+		fmt.Printf("Error sending backup: %v\n", err)
+	}
+}
+
+// Restore replaces the database with an uploaded file
+func (h *AdminHandler) Restore(c *gin.Context) {
+	// Get database path
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "./fitlab.db"
+	}
+
+	// Read uploaded file from form
+	file, header, err := c.Request.FormFile("database")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Error: "archivo no proporcionado",
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
+	defer file.Close()
+
+	// Verify it's a .db file
+	if header.Filename == "" || len(header.Filename) < 3 {
+		c.JSON(http.StatusBadRequest, models.APIResponse{
+			Error: "nombre de archivo inválido",
+			Code:  "VALIDATION_ERROR",
+		})
+		return
+	}
+
+	// Create temp file
+	tempPath := dbPath + ".restoring"
+	destFile, err := os.Create(tempPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al procesar archivo",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+	defer destFile.Close()
+
+	// Copy uploaded content
+	_, err = io.Copy(destFile, file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al guardar archivo",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	// Replace original database
+	err = os.Rename(tempPath, dbPath)
+	if err != nil {
+		// Try to cleanup temp file
+		os.Remove(tempPath)
+		c.JSON(http.StatusInternalServerError, models.APIResponse{
+			Error: "error al restaurar base de datos",
+			Code:  "INTERNAL_ERROR",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.APIResponse{
+		Data: gin.H{"message": "Base de datos restaurada correctamente. Los cambios se aplicarán en el próximo request."},
 	})
 }

@@ -65,5 +65,22 @@ export const useAdminStore = defineStore('admin', {
       this.error = null
       this.success = null
     },
+
+    async restoreDatabase(file) {
+      this.loading = true
+      this.error = null
+      this.success = null
+
+      try {
+        const response = await api.admin.restore(file)
+        this.success = 'Base de datos restaurada correctamente'
+        return true
+      } catch (err) {
+        this.error = err.message
+        return false
+      } finally {
+        this.loading = false
+      }
+    },
   },
 })

@@ -120,13 +120,15 @@ func main() {
 	// Admin routes (public login)
 	api.POST("/admin/login", authHandler.AdminLogin)
 
-	// Admin protected routes
+// Admin protected routes
 	admin := api.Group("/admin")
 	admin.Use(middleware.AdminMiddleware(sessionStore))
 	{
 		admin.GET("/users", adminHandler.ListUsers)
 		admin.PUT("/users/:id", adminHandler.UpdateUserName)
- 		admin.DELETE("/users/:id", adminHandler.DeleteUser)
+		admin.DELETE("/users/:id", adminHandler.DeleteUser)
+		admin.GET("/backup", adminHandler.Backup)
+		admin.POST("/restore", adminHandler.Restore)
 	}
 
 	// Health check

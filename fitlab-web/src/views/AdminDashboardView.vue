@@ -3,6 +3,11 @@
     <h1>Panel de Admin</h1>
     <p class="subtitle">Gestión de Usuarios</p>
 
+    <div class="toolbar">
+      <button class="btn btn-tool" @click="handleBackup">📥 Backup</button>
+      <button class="btn btn-tool" @click="openRestoreModal">📤 Restore</button>
+    </div>
+
     <div v-if="adminStore.error" class="error">{{ adminStore.error }}</div>
     <div v-if="adminStore.success" class="success">{{ adminStore.success }}</div>
 
@@ -69,20 +74,53 @@
         </div>
       </div>
     </div>
+
+    <!-- Restore Modal -->
+    <div v-if="showRestoreModal" class="modal-overlay" @click.self="closeRestoreModal">
+      <div class="modal-card">
+        <h3>Restaurar Base de Datos</h3>
+        <p class="warning-message">
+          ⚠️ Recomendamos hacer un backup antes de restaurar. Esto reemplazará todos los datos actuales.
+        </p>
+        <div class="form-group">
+          <label for="restore-file">Seleccionar archivo</label>
+          <input 
+            type="file" 
+            id="restore-file" 
+            accept=".db"
+            @change="handleFileSelect"
+          />
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" @click="closeRestoreModal">Cancelar</button>
+          <button 
+            class="btn btn-primary" 
+            @click="handleRestore" 
+            :disabled="!selectedFile || restoring"
+          >
+            {{ restoring ? 'Restaurando...' : 'Restaurar' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useAdminStore } from '../stores/admin'
+import { api } from '../api'
 
 const adminStore = useAdminStore()
 
 const showEditModal = ref(false)
 const showDeleteConfirm = ref(false)
+const showRestoreModal = ref(false)
 const editName = ref('')
 const userToEdit = ref(null)
 const userToDelete = ref(null)
+const selectedFile = ref(null)
+const restoring = ref(false)
 
 onMounted(async () => {
   await adminStore.fetchUsers()
@@ -130,6 +168,39 @@ function formatDate(dateStr) {
   if (!dateStr) return ''
   return new Date(dateStr).toLocaleDateString('es-AR')
 }
+
+function handleBackup() {
+  api.admin.backup()
+}
+
+function openRestoreModal() {
+  selectedFile.value = null
+  showRestoreModal.value = true
+}
+
+function closeRestoreModal() {
+  showRestoreModal.value = false
+  selectedFile.value = null
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0]
+  if (file) {
+    selectedFile.value = file
+  }
+}
+
+async function handleRestore() {
+  if (!selectedFile.value) return
+
+  restoring.value = true
+  const success = await adminStore.restoreDatabase(selectedFile.value)
+  restoring.value = false
+
+  if (success) {
+    closeRestoreModal()
+  }
+}
 </script>
 
 <style scoped>
@@ -147,6 +218,40 @@ h1 {
 .subtitle {
   color: #aaa;
   margin-bottom: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-tool {
+  background: #363636;
+  color: #fff;
+  border: 1px solid #555;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-tool:hover {
+  background: #404040;
+  border-color: #666;
+}
+
+.warning-message {
+  background: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: #ff9800;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .error {

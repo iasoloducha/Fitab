@@ -85,6 +85,28 @@ export const api = {
     getUsers: () => request('/admin/users'),
     updateUser: (id, data) => request(`/admin/users/${id}`, { method: 'PUT', body: data }),
     deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
+    backup: () => {
+      const token = document.cookie.replace(/(?:(?:^|.*;\s*)session\s*=\s*([^;]*).*$)|^.*$/, '$1')
+      const url = `${API_BASE}/admin/backup`
+      window.location.href = url
+    },
+    restore: (file) => {
+      const formData = new FormData()
+      formData.append('database', file)
+      const url = `${API_BASE}/admin/restore`
+      return fetch(url, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      }).then(res => {
+        if (!res.ok) {
+          return res.json().then(data => {
+            throw new Error(data.error || 'Error al restaurar')
+          })
+        }
+        return res.json()
+      })
+    },
   },
 }
 
