@@ -1,0 +1,11 @@
+app = 'fitlab-scheduler'
+primary_region = 'gru'
+
+[build]
+  [build.args]
+    GO_VERSION = '1.21'
+
+[env]
+  DATABASE_PATH = '/data/fitlab.db'
+  CHECK_INTERVAL = '5m'
+  RUN_MODE = 'scheduler'

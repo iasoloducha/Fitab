@@ -7,16 +7,26 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"fitlab-api/internal/database"
 	"fitlab-api/internal/handlers"
 	"fitlab-api/internal/middleware"
+	"fitlab-api/internal/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 )
 
 func main() {
+	if os.Getenv("RUN_MODE") == "scheduler" {
+		runScheduler()
+		return
+	}
+	runServer()
+}
+
+func runServer() {
 	// Configuration
 	dbPath := getEnv("DATABASE_PATH", "./fitlab.db")
 	// Fly.io provides PORT env var; fallback to ADDR then default :8080
@@ -198,4 +208,27 @@ func generateRandomSecret() string {
 		log.Fatalf("Failed to generate random secret: %v", err)
 	}
 	return hex.EncodeToString(b)
+}
+
+func runScheduler() {
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "/data/fitlab.db"
+	}
+	db, err := database.New(dbPath)
+	if err != nil {
+		log.Fatalf("Scheduler: failed to init DB: %v", err)
+	}
+	defer db.Close()
+
+	intervalStr := os.Getenv("CHECK_INTERVAL")
+	interval := 5 * time.Minute
+	if intervalStr != "" {
+		if d, err := time.ParseDuration(intervalStr); err == nil && d > 0 {
+			interval = d
+		}
+	}
+
+	log.Printf("Scheduler mode, DB: %s, interval: %v", dbPath, interval)
+	services.StartNotifierLoop(db.DB, interval)
 }
