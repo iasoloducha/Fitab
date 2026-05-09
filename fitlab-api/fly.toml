@@ -1,8 +1,4 @@
-# fly.toml app configuration file generated for fitlab-api on 2026-05-02T22:30:30-03:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
+# fitlab-api — main HTTP server
 app = 'fitlab-api'
 primary_region = 'gru'
 
@@ -28,3 +24,17 @@ primary_region = 'gru'
 
 [[vm]]
   size = 'shared-cpu-1x'
+
+# ============================================================
+# fitlab-scheduler — notification scheduler (separate app)
+# To deploy:
+#   1. cp fly.toml fly-scheduler.toml
+#   2. Edit fly-scheduler.toml:
+#      - app = 'fitlab-scheduler'
+#      - Remove [http_service]
+#      - Add cmd = 'fitlab-scheduler'
+#      - Set CHECK_INTERVAL env var (e.g., '5m')
+#   3. fly launch --config fly-scheduler.toml --no-deploy
+#   4. fly secrets import < .env.scheduler
+#   5. fly deploy --config fly-scheduler.toml
+# ============================================================

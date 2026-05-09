@@ -1,6 +1,11 @@
 # Build outputs
 fitlab-web/dist/
 
+# Local DB and binaries
+fitlab-api/fitlab.db
+fitlab-api/fitlab-api.exe
+fitlab-api/fitlab-scheduler
+
 # SDD artifacts
 .atl/
 

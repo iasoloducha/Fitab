@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// EmailConfig holds SMTP configuration
 type EmailConfig struct {
 	Host string
 	Port string
@@ -17,7 +16,6 @@ type EmailConfig struct {
 	From string
 }
 
-// GetEmailConfig loads SMTP config from environment
 func GetEmailConfig() EmailConfig {
 	return EmailConfig{
 		Host: os.Getenv("SMTP_HOST"),
@@ -28,78 +26,112 @@ func GetEmailConfig() EmailConfig {
 	}
 }
 
-// SendRecoveryEmail sends password recovery email with temporary password
-func SendRecoveryEmail(toEmail, tempPassword string) error {
-	cfg := GetEmailConfig()
+func (cfg EmailConfig) IsConfigured() bool {
+	return cfg.Host != "" && cfg.User != "" && cfg.Pass != ""
+}
 
-	if cfg.Host == "" || cfg.User == "" || cfg.Pass == "" {
-		return fmt.Errorf("SMTP not configured")
+func (cfg EmailConfig) FromName() string {
+	if cfg.From == "" {
+		return "Fitlab"
 	}
-
-	// Sanitize email for From header
-	fromName := "Fitlab"
-	if cfg.From != "" {
-		parts := strings.Split(cfg.From, "<")
-		if len(parts) > 1 {
-			fromName = strings.Trim(parts[0], " ")
-		}
+	parts := strings.Split(cfg.From, "<")
+	if len(parts) > 1 {
+		return strings.TrimSpace(parts[0])
 	}
+	return "Fitlab"
+}
 
-	// Build email
-	subject := "Recuperación de contraseña - Fitlab"
-	body := fmt.Sprintf("From: %s <%s>\r\nTo: %s\r\nSubject: %s\r\n\r\nHola,\r\n\r\nTu contraseña temporal es: %s\r\n\r\nIngresá con esta contraseña y luego podés cambiarla desde tu perfil.\r\n\r\nSaludos,\r\nEquipo Fitlab\r\n", fromName, cfg.User, toEmail, subject, tempPassword)
-
-	// Connect to SMTP server
+func (cfg EmailConfig) Send(to, subject, body string) error {
 	addr := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 
-	// Create TLS config that skips verification (for known hosts like Gmail)
-	tlsConfig := &tls.Config{
-		ServerName:         cfg.Host,
-		InsecureSkipVerify: false,
-	}
+	tlsConfig := &tls.Config{ServerName: cfg.Host}
 
-	// Connect and upgrade to TLS
 	conn, err := smtp.Dial(addr)
 	if err != nil {
-		return fmt.Errorf("error connecting to SMTP: %v", err)
+		return fmt.Errorf("connecting to SMTP: %v", err)
 	}
+	defer conn.Close()
 
-	// Start TLS
 	if err = conn.StartTLS(tlsConfig); err != nil {
-		return fmt.Errorf("error starting TLS: %v", err)
+		return fmt.Errorf("starting TLS: %v", err)
 	}
 
-	// Authenticate
 	auth := smtp.PlainAuth("", cfg.User, cfg.Pass, cfg.Host)
 	if err = conn.Auth(auth); err != nil {
-		return fmt.Errorf("error authenticating: %v", err)
+		return fmt.Errorf("authenticating: %v", err)
 	}
 
-	// Send email
 	if err = conn.Mail(cfg.User); err != nil {
-		return fmt.Errorf("error setting sender: %v", err)
+		return fmt.Errorf("setting sender: %v", err)
 	}
-
-	if err = conn.Rcpt(toEmail); err != nil {
-		return fmt.Errorf("error setting recipient: %v", err)
+	if err = conn.Rcpt(to); err != nil {
+		return fmt.Errorf("setting recipient: %v", err)
 	}
 
 	w, err := conn.Data()
 	if err != nil {
-		return fmt.Errorf("error creating data stream: %v", err)
+		return fmt.Errorf("creating data stream: %v", err)
 	}
 
-	_, err = w.Write([]byte(body))
-	if err != nil {
-		return fmt.Errorf("error writing email: %v", err)
+	fullBody := fmt.Sprintf("From: %s <%s>\r\nTo: %s\r\nSubject: %s\r\n\r\n%s",
+		cfg.FromName(), cfg.User, to, subject, body)
+
+	if _, err = w.Write([]byte(fullBody)); err != nil {
+		w.Close()
+		return fmt.Errorf("writing email: %v", err)
 	}
 
-	err = w.Close()
-	if err != nil {
-		return fmt.Errorf("error closing data stream: %v", err)
-	}
-
-	conn.Quit()
-
+	w.Close()
 	return nil
+}
+
+func SendRecoveryEmail(toEmail, tempPassword string) error {
+	cfg := GetEmailConfig()
+	if !cfg.IsConfigured() {
+		return fmt.Errorf("SMTP not configured")
+	}
+
+	body := fmt.Sprintf("Hola,\r\n\r\nTu contraseña temporal es: %s\r\n\r\nIngresá con esta contraseña y luego podés cambiarla desde tu perfil.\r\n\r\nSaludos,\r\nEquipo Fitlab\r\n", tempPassword)
+	return cfg.Send(toEmail, "Recuperación de contraseña - Fitlab", body)
+}
+
+type ProgressStats struct {
+	ExercisesLogged  int
+	CompletionRate   float64
+	PerExerciseData  string
+}
+
+func SendExpirationReminderEmail(studentEmail, studentName, professorEmail, routineTitle, endDate string) error {
+	cfg := GetEmailConfig()
+	if !cfg.IsConfigured() {
+		return fmt.Errorf("SMTP not configured")
+	}
+
+	professorLine := ""
+	if professorEmail != "" {
+		professorLine = fmt.Sprintf("- Profesor: %s\r\n", professorEmail)
+	}
+
+	body := fmt.Sprintf("Hola %s,\r\n\r\nTu rutina \"%s\" está por vencer.\r\n\r\nFecha de fin: %s\r\n- Alumno: %s\r\n%s\r\nContactá a tu profesor para renovar tu rutina.\r\n\r\nSaludos,\r\nEquipo Fitlab\r\n",
+		studentName, routineTitle, endDate, studentEmail, professorLine)
+
+	if professorEmail != "" {
+		profBody := fmt.Sprintf("Hola,\r\n\r\nLa rutina \"%s\" del alumno %s (%s) vence el %s.\r\n\r\nConsiderá contactar al alumno para renovar su rutina.\r\n\r\nSaludos,\r\nEquipo Fitlab\r\n",
+			routineTitle, studentName, studentEmail, endDate)
+		cfg.Send(professorEmail, "Recordatorio: rutina por vencer - Fitlab", profBody)
+	}
+
+	return cfg.Send(studentEmail, "Recordatorio: rutina por vencer - Fitlab", body)
+}
+
+func SendRoutineCompletedEmail(toEmail, studentName, professorName, routineTitle string, stats ProgressStats) error {
+	cfg := GetEmailConfig()
+	if !cfg.IsConfigured() {
+		return fmt.Errorf("SMTP not configured")
+	}
+
+	body := fmt.Sprintf("Hola %s,\r\n\r\nTu rutina \"%s\" ha finalizado.\r\n\r\nResumen de tu progreso:\r\n- Ejercicios registrados: %d\r\n- Tasa de completitud: %.0f%%\r\n%s\r\n¡Gracias por entrenar con Fitlab!\r\n\r\nSaludos,\r\nEquipo Fitlab\r\n",
+		studentName, routineTitle, stats.ExercisesLogged, stats.CompletionRate, stats.PerExerciseData)
+
+	return cfg.Send(toEmail, "Tu rutina ha finalizado - Fitlab", body)
 }

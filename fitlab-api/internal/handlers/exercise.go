@@ -322,16 +322,30 @@ func (h *ExerciseHandler) GetProgress(c *gin.Context) {
 		}
 	}
 
-	rows, err := h.DB.Query(`
+	from := c.Query("from")
+	to := c.Query("to")
+
+	query := `
 		SELECT el.id, el.exercise_id, el.date, el.completed, el.actual_weight, el.notes, el.created_at,
 		       e.name as exercise_name
 		FROM exercise_logs el
 		JOIN exercises e ON el.exercise_id = e.id
 		JOIN routines r ON e.routine_id = r.id
-		WHERE el.user_id = ? AND r.user_id = ?
-		ORDER BY el.date DESC`,
-		userID, userID,
-	)
+		WHERE el.user_id = ? AND r.user_id = ?`
+	args := []interface{}{userID, userID}
+
+	if from != "" {
+		query += " AND el.date >= ?"
+		args = append(args, from)
+	}
+	if to != "" {
+		query += " AND el.date <= ?"
+		args = append(args, to)
+	}
+
+	query += " ORDER BY el.date DESC"
+
+	rows, err := h.DB.Query(query, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al obtener progreso"})
 		return
