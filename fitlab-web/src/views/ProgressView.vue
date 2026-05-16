@@ -46,7 +46,7 @@
       </div>
       
       <div v-else class="no-data card">
-        <p>No hay datos de peso para este ejercicio todavía.</p>
+        <p>No hay datos de progreso para este ejercicio todavía.</p>
         <p v-if="selectedExercise">Intentá con "Todos los ejercicios" para ver todos los registros.</p>
       </div>
       
@@ -60,10 +60,20 @@
           </div>
           <div class="progress-status">
             <span v-if="item.completed" class="badge badge-done">✓</span>
-            <span v-if="item.actual_weight" class="weight">
-              {{ item.actual_weight }}kg
+            <span class="weight">
+              <template v-if="item.actual_sets || item.actual_reps">
+                {{ item.actual_sets || '?' }} series x {{ item.actual_reps || '?' }} reps
+              </template>
+              <template v-if="item.actual_weight && (item.actual_sets || item.actual_reps)">
+                — {{ item.actual_weight }}kg
+              </template>
+              <template v-else-if="item.actual_weight && !item.actual_sets && !item.actual_reps">
+                {{ item.actual_weight }}kg
+              </template>
+              <template v-if="!item.actual_weight && !item.actual_sets && !item.actual_reps">
+                Sin registro
+              </template>
             </span>
-            <span v-else class="weight weight-none">Sin peso registrado</span>
           </div>
           <div v-if="item.notes" class="progress-notes">
             📝 {{ item.notes }}
@@ -168,34 +178,74 @@ const chartData = computed(() => {
     ? progress.value.filter(p => p.exercise_name === selectedExercise.value)
     : progress.value.filter(p => p.actual_weight)
   
-  // Solo items con peso registrado
-  const withWeight = items.filter(p => p.actual_weight && p.actual_weight.trim() !== '')
+  // Items con ALGÚN dato (peso, series o reps)
+  const withData = items.filter(p => 
+    (p.actual_weight && p.actual_weight.trim() !== '') || 
+    p.actual_sets || 
+    p.actual_reps
+  )
   
-  if (withWeight.length === 0) {
+  if (withData.length === 0) {
     return { labels: [], datasets: [] }
   }
   
   // Ordenar por fecha
-  withWeight.sort((a, b) => new Date(a.date) - new Date(b.date))
+  withData.sort((a, b) => new Date(a.date) - new Date(b.date))
   
   // Extraer pesos numéricos (solo la primera cifra si es progresivo)
-  const weights = withWeight.map(p => {
+  const weights = withData.map(p => {
+    if (!p.actual_weight) return null
     const first = p.actual_weight.split(/[\s,]+/)[0]
     return parseFloat(first) || 0
   })
   
+  // Extraer sets
+  const sets = withData.map(p => p.actual_sets || null)
+  
+  // Extraer reps numéricos (solo la primera cifra si es progresivo)
+  const reps = withData.map(p => {
+    if (!p.actual_reps) return null
+    const first = p.actual_reps.split(/[\s,]+/)[0]
+    return parseFloat(first) || null
+  })
+  
   return {
-    labels: withWeight.map(p => formatShortDate(p.date)),
-    datasets: [{
-      label: selectedExercise.value || 'Peso (kg)',
-      data: weights,
-      borderColor: '#e63946',
-      backgroundColor: 'rgba(230, 57, 70, 0.1)',
-      tension: 0.3,
-      fill: true,
-      pointRadius: 6,
-      pointBackgroundColor: '#e63946',
-    }]
+    labels: withData.map(p => formatShortDate(p.date)),
+    datasets: [
+      {
+        label: selectedExercise.value ? 'Peso (kg)' : 'Peso (kg)',
+        data: weights,
+        borderColor: '#e63946',
+        backgroundColor: 'rgba(230, 57, 70, 0.1)',
+        tension: 0.3,
+        fill: false,
+        pointRadius: 6,
+        pointBackgroundColor: '#e63946',
+        spanGaps: true,
+      },
+      {
+        label: 'Series',
+        data: sets,
+        borderColor: '#457bff',
+        backgroundColor: 'rgba(69, 123, 255, 0.1)',
+        tension: 0.3,
+        fill: false,
+        pointRadius: 6,
+        pointBackgroundColor: '#457bff',
+        spanGaps: true,
+      },
+      {
+        label: 'Reps',
+        data: reps,
+        borderColor: '#28a745',
+        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+        tension: 0.3,
+        fill: false,
+        pointRadius: 6,
+        pointBackgroundColor: '#28a745',
+        spanGaps: true,
+      },
+    ]
   }
 })
 
@@ -204,20 +254,32 @@ const chartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false
+      display: true,
+      labels: {
+        color: '#ccc',
+        boxWidth: 16,
+        padding: 16,
+      }
     },
     tooltip: {
       callbacks: {
-        label: (context) => `${context.parsed.y} kg`
+        label: (context) => {
+          const label = context.dataset.label || ''
+          const val = context.parsed.y
+          if (label === 'Peso (kg)') return `${val} kg`
+          if (label === 'Series') return `${val} series`
+          if (label === 'Reps') return `${val} reps`
+          return `${label}: ${val}`
+        }
       }
     }
   },
   scales: {
     y: {
-      beginAtZero: false,
+      beginAtZero: true,
       title: {
         display: true,
-        text: 'Peso (kg)'
+        text: 'Valor'
       }
     },
     x: {

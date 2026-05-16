@@ -47,6 +47,8 @@ type ExerciseLog struct {
 	Date        string    `json:"date"`
 	Completed   bool     `json:"completed"`
 	ActualWeight string   `json:"actual_weight,omitempty"`
+	ActualSets  *int     `json:"actual_sets,omitempty"`
+	ActualReps  string   `json:"actual_reps,omitempty"`
 	Notes       string    `json:"notes,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 }
@@ -111,6 +113,8 @@ type LogExerciseRequest struct {
 	Date         string `json:"date" binding:"required"`
 	Completed   bool   `json:"completed"`
 	ActualWeight string `json:"actual_weight,omitempty"`
+	ActualSets  *int   `json:"actual_sets,omitempty"`
+	ActualReps  string `json:"actual_reps,omitempty"`
 	Notes       string `json:"notes,omitempty"`
 }
 

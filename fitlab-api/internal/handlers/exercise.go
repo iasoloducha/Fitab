@@ -193,9 +193,9 @@ func (h *ExerciseHandler) LogCompletion(c *gin.Context) {
 	}
 
 	result, err := h.DB.Exec(`
-		INSERT INTO exercise_logs (exercise_id, user_id, date, completed, actual_weight, notes)
-		VALUES (?, ?, ?, ?, ?, ?)`,
-		exerciseID, userID, req.Date, req.Completed, req.ActualWeight, req.Notes,
+		INSERT INTO exercise_logs (exercise_id, user_id, date, completed, actual_weight, actual_sets, actual_reps, notes)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		exerciseID, userID, req.Date, req.Completed, req.ActualWeight, req.ActualSets, req.ActualReps, req.Notes,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al guardar"})
@@ -215,7 +215,7 @@ func (h *ExerciseHandler) GetLogs(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 
 	rows, err := h.DB.Query(`
-		SELECT id, exercise_id, date, completed, actual_weight, notes, created_at
+		SELECT id, exercise_id, date, completed, actual_weight, actual_sets, actual_reps, notes, created_at
 		FROM exercise_logs
 		WHERE exercise_id = ? AND user_id = ?
 		ORDER BY date DESC`,
@@ -231,13 +231,22 @@ func (h *ExerciseHandler) GetLogs(c *gin.Context) {
 	for rows.Next() {
 		var log models.ExerciseLog
 		var weight sql.NullString
+		var sets sql.NullInt64
+		var reps sql.NullString
 		var notes sql.NullString
 
-		if err := rows.Scan(&log.ID, &log.ExerciseID, &log.Date, &log.Completed, &weight, &notes, &log.CreatedAt); err != nil {
+		if err := rows.Scan(&log.ID, &log.ExerciseID, &log.Date, &log.Completed, &weight, &sets, &reps, &notes, &log.CreatedAt); err != nil {
 			continue
 		}
 		if weight.Valid {
 			log.ActualWeight = weight.String
+		}
+		if sets.Valid {
+			s := int(sets.Int64)
+			log.ActualSets = &s
+		}
+		if reps.Valid {
+			log.ActualReps = reps.String
 		}
 		if notes.Valid {
 			log.Notes = notes.String
@@ -326,7 +335,7 @@ func (h *ExerciseHandler) GetProgress(c *gin.Context) {
 	to := c.Query("to")
 
 	query := `
-		SELECT el.id, el.exercise_id, el.date, el.completed, el.actual_weight, el.notes, el.created_at,
+		SELECT el.id, el.exercise_id, el.date, el.completed, el.actual_weight, el.actual_sets, el.actual_reps, el.notes, el.created_at,
 		       e.name as exercise_name
 		FROM exercise_logs el
 		JOIN exercises e ON el.exercise_id = e.id
@@ -357,13 +366,22 @@ func (h *ExerciseHandler) GetProgress(c *gin.Context) {
 		var log models.ExerciseLog
 		var exerciseName string
 		var weight sql.NullString
+		var sets sql.NullInt64
+		var reps sql.NullString
 		var notes sql.NullString
 
-		if err := rows.Scan(&log.ID, &log.ExerciseID, &log.Date, &log.Completed, &weight, &notes, &log.CreatedAt, &exerciseName); err != nil {
+		if err := rows.Scan(&log.ID, &log.ExerciseID, &log.Date, &log.Completed, &weight, &sets, &reps, &notes, &log.CreatedAt, &exerciseName); err != nil {
 			continue
 		}
 		if weight.Valid {
 			log.ActualWeight = weight.String
+		}
+		if sets.Valid {
+			s := int(sets.Int64)
+			log.ActualSets = &s
+		}
+		if reps.Valid {
+			log.ActualReps = reps.String
 		}
 		if notes.Valid {
 			log.Notes = notes.String
@@ -376,6 +394,8 @@ func (h *ExerciseHandler) GetProgress(c *gin.Context) {
 			"date":         log.Date,
 			"completed":    log.Completed,
 			"actual_weight": log.ActualWeight,
+			"actual_sets":   log.ActualSets,
+			"actual_reps":   log.ActualReps,
 			"notes":        log.Notes,
 		})
 	}

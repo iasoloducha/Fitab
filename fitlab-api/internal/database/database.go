@@ -51,20 +51,32 @@ func New(dbPath string) (*DB, error) {
 
 // migrate runs all SQL migrations in order
 func (db *DB) migrate() error {
-	migrationFiles, err := migrationsFS.ReadFile("migrations/001_initial.sql")
+	// Read embedded migration directory listing
+	entries, err := migrationsFS.ReadDir("migrations")
 	if err != nil {
-		return fmt.Errorf("reading migrations: %w", err)
+		return fmt.Errorf("listing migrations: %w", err)
 	}
 
-	// Split by semicolons and execute each statement
-	statements := strings.Split(string(migrationFiles), ";")
-	for _, stmt := range statements {
-		stmt = strings.TrimSpace(stmt)
-		if stmt == "" {
+	for _, entry := range entries {
+		if entry.IsDir() {
 			continue
 		}
-		if _, err := db.Exec(stmt); err != nil {
-			return fmt.Errorf("executing migration: %w\nStatement: %s", err, stmt)
+
+		migrationFiles, err := migrationsFS.ReadFile("migrations/" + entry.Name())
+		if err != nil {
+			return fmt.Errorf("reading migration %s: %w", entry.Name(), err)
+		}
+
+		// Split by semicolons and execute each statement
+		statements := strings.Split(string(migrationFiles), ";")
+		for _, stmt := range statements {
+			stmt = strings.TrimSpace(stmt)
+			if stmt == "" {
+				continue
+			}
+			if _, err := db.Exec(stmt); err != nil {
+				return fmt.Errorf("executing migration %s: %w\nStatement: %s", entry.Name(), err, stmt)
+			}
 		}
 	}
 

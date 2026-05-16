@@ -147,14 +147,33 @@
         <div class="modal">
           <h3>Registrar ejercicio: {{ loggingExercise?.name }}</h3>
           <p class="modal-subtitle">Peso sugerido: {{ loggingExercise?.weight_kg || 'no especificado' }}</p>
-          <div class="form-group">
-            <label>Peso real (kg)</label>
-            <input 
-              type="text" 
-              v-model="logForm.actual_weight" 
-              placeholder="Ej: 20, 25, 30-35"
-              autofocus
-            />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Series reales</label>
+              <input 
+                type="number" 
+                v-model.number="logForm.actual_sets" 
+                min="1"
+                placeholder="Ej: 3"
+              />
+            </div>
+            <div class="form-group">
+              <label>Reps reales</label>
+              <input 
+                type="text" 
+                v-model="logForm.actual_reps" 
+                placeholder="Ej: 12"
+              />
+            </div>
+            <div class="form-group">
+              <label>Peso real (kg)</label>
+              <input 
+                type="text" 
+                v-model="logForm.actual_weight" 
+                placeholder="Ej: 20, 25, 30-35"
+                autofocus
+              />
+            </div>
           </div>
           <div class="form-group">
             <label>Notas (opcional)</label>
@@ -230,6 +249,8 @@ const showLogModalVisible = ref(false)
 const loggingExercise = ref(null)
 const logForm = reactive({
   actual_weight: '',
+  actual_sets: null,
+  actual_reps: '',
   notes: '',
 })
 const editingExercise = ref(null)
@@ -298,6 +319,8 @@ function isCompletedToday(exerciseId) {
 function showLogModal(exercise) {
   loggingExercise.value = exercise
   logForm.actual_weight = exercise.weight_kg || ''
+  logForm.actual_sets = exercise.sets || null
+  logForm.actual_reps = exercise.reps || ''
   logForm.notes = ''
   showLogModalVisible.value = true
 }
@@ -315,6 +338,8 @@ async function saveLog() {
     date: today,
     completed: true,
     actual_weight: logForm.actual_weight,
+    actual_sets: logForm.actual_sets || null,
+    actual_reps: logForm.actual_reps || null,
     notes: logForm.notes || null,
   })
   
