@@ -96,10 +96,11 @@
           </div>
           <div class="form-group" style="flex: 2">
             <label>Nombre del ejercicio</label>
-            <input 
-              type="text" 
-              v-model="newExercise.name" 
-              placeholder="Ej: Press de banca"
+            <ExerciseAutocomplete
+              :model-value="newExercise.catalog_exercise_id"
+              @update:model-value="newExercise.catalog_exercise_id = $event"
+              @update:name="newExercise.name = $event"
+              placeholder="Buscá o escribí un ejercicio..."
             />
           </div>
         </div>
@@ -201,7 +202,12 @@
             </div>
             <div class="form-group" style="flex: 2">
               <label>Nombre</label>
-              <input type="text" v-model="editForm.name" />
+              <ExerciseAutocomplete
+                :model-value="editForm.catalog_exercise_id"
+                @update:model-value="editForm.catalog_exercise_id = $event"
+                @update:name="editForm.name = $event"
+                placeholder="Buscá o escribí un ejercicio..."
+              />
             </div>
           </div>
           <div class="form-row">
@@ -238,6 +244,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useRoutineStore } from '../stores/routines'
 import { api } from '../api'
+import ExerciseAutocomplete from '../components/ExerciseAutocomplete.vue'
 
 const route = useRoute()
 const auth = useAuthStore()
@@ -257,6 +264,7 @@ const editingExercise = ref(null)
 const editForm = reactive({
   day_number: 1,
   name: '',
+  catalog_exercise_id: null,
   sets: 3,
   reps: '',
   weight_kg: '',
@@ -266,6 +274,7 @@ const editForm = reactive({
 const newExercise = reactive({
   day_number: 1,
   name: '',
+  catalog_exercise_id: null,
   sets: 3,
   reps: '',
   weight_kg: '',
@@ -363,6 +372,7 @@ async function addExercise() {
   
   // Reset form
   newExercise.name = ''
+  newExercise.catalog_exercise_id = null
   newExercise.reps = ''
   newExercise.weight_kg = ''
   newExercise.observations = ''
@@ -382,6 +392,7 @@ function editExercise(exercise) {
   editingExercise.value = exercise
   editForm.day_number = exercise.day_number
   editForm.name = exercise.name
+  editForm.catalog_exercise_id = exercise.catalog_exercise_id || null
   editForm.sets = exercise.sets
   editForm.reps = exercise.reps
   editForm.weight_kg = exercise.weight_kg || ''
@@ -400,6 +411,7 @@ async function saveEdit() {
   try {
     await api.routines.updateExercise(editingExercise.value.id, {
       day_number: editForm.day_number,
+      catalog_exercise_id: editForm.catalog_exercise_id || null,
       name: editForm.name,
       sets: editForm.sets,
       reps: editForm.reps,

@@ -10,6 +10,7 @@ import RoutineView from '../views/RoutineView.vue'
 import RoutineEditView from '../views/RoutineEditView.vue'
 import ProgressView from '../views/ProgressView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import CatalogManagementView from '../views/CatalogManagementView.vue'
 
 const routes = [
   {
@@ -76,6 +77,12 @@ const routes = [
         path: 'profile',
         name: 'profile',
         component: ProfileView,
+      },
+      {
+        path: 'catalog',
+        name: 'catalog',
+        component: CatalogManagementView,
+        meta: { requiresProfessor: true },
       },
     ],
   },

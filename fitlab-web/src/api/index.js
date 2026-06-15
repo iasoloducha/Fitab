@@ -70,6 +70,13 @@ export const api = {
     list: () => request('/users/students'),
   },
   
+  catalog: {
+    list: (q) => request(`/catalog/exercises${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+    create: (data) => request('/catalog/exercises', { method: 'POST', body: data }),
+    update: (id, data) => request(`/catalog/exercises/${id}`, { method: 'PUT', body: data }),
+    delete: (id) => request(`/catalog/exercises/${id}`, { method: 'DELETE' }),
+  },
+
   logs: {
     create: (exerciseId, data) => request(`/exercises/${exerciseId}/logs`, { method: 'POST', body: data }),
     list: (exerciseId) => request(`/exercises/${exerciseId}/logs`),
