@@ -25,12 +25,21 @@ type Routine struct {
 	Exercises []Exercise `json:"exercises,omitempty"`
 }
 
+// CatalogExercise represents an exercise in the global catalog
+type CatalogExercise struct {
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	ImageURLs string    `json:"image_urls,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 // Exercise represents a single exercise in a routine
 type Exercise struct {
 	ID            int64     `json:"id"`
 	RoutineID    int64     `json:"routine_id"`
 	DayNumber    int       `json:"day_number"`
 	Name        string    `json:"name"`
+	CatalogExerciseID *int64    `json:"catalog_exercise_id,omitempty"`
 	Sets        int       `json:"sets"`
 	Reps        string   `json:"reps"` // can be "12" or "12 c/p"
 	WeightKg    string   `json:"weight_kg,omitempty"` // can be "20 22 26" for progressive
@@ -90,23 +99,25 @@ type UpdateRoutineRequest struct {
 }
 
 type CreateExerciseRequest struct {
-	DayNumber    int     `json:"day_number" binding:"required"`
-	Name        string  `json:"name" binding:"required"`
-	Sets        int     `json:"sets" binding:"required,min=1"`
-	Reps        string  `json:"reps" binding:"required"`
-	WeightKg    string  `json:"weight_kg,omitempty"`
-	Observations string `json:"observations,omitempty"`
-	SortOrder   int     `json:"sort_order,omitempty"`
+	DayNumber         int     `json:"day_number" binding:"required"`
+	CatalogExerciseID *int64  `json:"catalog_exercise_id,omitempty"`
+	Name              string  `json:"name" binding:"required"`
+	Sets              int     `json:"sets" binding:"required,min=1"`
+	Reps              string  `json:"reps" binding:"required"`
+	WeightKg          string  `json:"weight_kg,omitempty"`
+	Observations      string  `json:"observations,omitempty"`
+	SortOrder         int     `json:"sort_order,omitempty"`
 }
 
 type UpdateExerciseRequest struct {
-	DayNumber    *int     `json:"day_number,omitempty"`
-	Name        *string   `json:"name,omitempty"`
-	Sets        *int      `json:"sets,omitempty"`
-	Reps        *string  `json:"reps,omitempty"`
-	WeightKg    *string  `json:"weight_kg,omitempty"`
-	Observations *string  `json:"observations,omitempty"`
-	SortOrder   *int     `json:"sort_order,omitempty"`
+	DayNumber         *int     `json:"day_number,omitempty"`
+	CatalogExerciseID *int64   `json:"catalog_exercise_id,omitempty"`
+	Name              *string  `json:"name,omitempty"`
+	Sets              *int     `json:"sets,omitempty"`
+	Reps              *string  `json:"reps,omitempty"`
+	WeightKg          *string  `json:"weight_kg,omitempty"`
+	Observations      *string  `json:"observations,omitempty"`
+	SortOrder         *int     `json:"sort_order,omitempty"`
 }
 
 type LogExerciseRequest struct {
@@ -128,4 +139,15 @@ type APIResponse struct {
 	Error string `json:"error,omitempty"`
 	Code  string `json:"code,omitempty"`
 	Total int    `json:"total,omitempty"`
+}
+
+// Catalog exercise request DTOs
+type CreateCatalogExerciseRequest struct {
+	Name      string `json:"name" binding:"required"`
+	ImageURLs string `json:"image_urls,omitempty"`
+}
+
+type UpdateCatalogExerciseRequest struct {
+	Name      *string `json:"name,omitempty"`
+	ImageURLs *string `json:"image_urls,omitempty"`
 }
