@@ -47,6 +47,25 @@ func (h *ExerciseHandler) Create(c *gin.Context) {
 		return
 	}
 
+	// Resolve name from catalog if catalog_exercise_id is provided
+	exerciseName := req.Name
+	if req.CatalogExerciseID != nil {
+		var catalogName string
+		err := h.DB.QueryRow("SELECT name FROM exercise_catalog WHERE id = ?", *req.CatalogExerciseID).Scan(&catalogName)
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "el ejercicio del catálogo no existe",
+				"code":  "NOT_FOUND",
+			})
+			return
+		}
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error interno"})
+			return
+		}
+		exerciseName = catalogName
+	}
+
 	sortOrder := req.SortOrder
 	if sortOrder == 0 {
 		// Get next sort order for this day
@@ -57,10 +76,15 @@ func (h *ExerciseHandler) Create(c *gin.Context) {
 		}
 	}
 
+	var catalogExerciseID interface{}
+	if req.CatalogExerciseID != nil {
+		catalogExerciseID = *req.CatalogExerciseID
+	}
+
 	result, err := h.DB.Exec(`
-		INSERT INTO exercises (routine_id, day_number, name, sets, reps, weight_kg, observations, sort_order)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		routineID, req.DayNumber, req.Name, req.Sets, req.Reps, req.WeightKg, req.Observations, sortOrder,
+		INSERT INTO exercises (routine_id, day_number, name, catalog_exercise_id, sets, reps, weight_kg, observations, sort_order)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		routineID, req.DayNumber, exerciseName, catalogExerciseID, req.Sets, req.Reps, req.WeightKg, req.Observations, sortOrder,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al crear ejercicio"})
@@ -108,17 +132,38 @@ func (h *ExerciseHandler) Update(c *gin.Context) {
 		return
 	}
 
+	// Resolve name from catalog if catalog_exercise_id is provided
+	exerciseName := req.Name
+	if req.CatalogExerciseID != nil {
+		var catalogName string
+		err := h.DB.QueryRow("SELECT name FROM exercise_catalog WHERE id = ?", *req.CatalogExerciseID).Scan(&catalogName)
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "el ejercicio del catálogo no existe",
+				"code":  "NOT_FOUND",
+			})
+			return
+		}
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error interno"})
+			return
+		}
+		// Override the name with the catalog name
+		exerciseName = &catalogName
+	}
+
 	_, err = h.DB.Exec(`
 		UPDATE exercises SET
 			day_number = COALESCE(?, day_number),
 			name = COALESCE(NULLIF(?, ''), name),
+			catalog_exercise_id = COALESCE(?, catalog_exercise_id),
 			sets = COALESCE(?, sets),
 			reps = COALESCE(NULLIF(?, ''), reps),
 			weight_kg = ?,
 			observations = COALESCE(NULLIF(?, ''), observations),
 			sort_order = COALESCE(?, sort_order)
 		WHERE id = ?`,
-		req.DayNumber, req.Name, req.Sets, req.Reps, req.WeightKg, req.Observations, req.SortOrder, exerciseID,
+		req.DayNumber, exerciseName, req.CatalogExerciseID, req.Sets, req.Reps, req.WeightKg, req.Observations, req.SortOrder, exerciseID,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al actualizar"})

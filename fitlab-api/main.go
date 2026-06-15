@@ -71,6 +71,7 @@ func runServer() {
 	adminHandler := handlers.NewAdminHandler(db.DB)
 	routineHandler := handlers.NewRoutineHandler(db.DB)
 	exerciseHandler := handlers.NewExerciseHandler(db.DB)
+	catalogHandler := handlers.NewCatalogExerciseHandler(db.DB)
 
 	// Setup router
 	r := gin.Default()
@@ -117,6 +118,12 @@ func runServer() {
 				professor.PUT("/exercises/:id", exerciseHandler.Update)
 				professor.DELETE("/exercises/:id", exerciseHandler.Delete)
 				professor.GET("/users/students", authHandler.GetStudents)
+
+				// Catalog exercise management
+				professor.GET("/catalog/exercises", catalogHandler.List)
+				professor.POST("/catalog/exercises", catalogHandler.Create)
+				professor.PUT("/catalog/exercises/:id", catalogHandler.Update)
+				professor.DELETE("/catalog/exercises/:id", catalogHandler.Delete)
 			}
 
 			// Student exercise logging
