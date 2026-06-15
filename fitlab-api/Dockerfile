@@ -18,4 +18,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /run-app /usr/local/bin/
 COPY --from=builder /fitlab-scheduler /usr/local/bin/
-CMD ["fitlab-scheduler"]
+CMD ["run-app"]
