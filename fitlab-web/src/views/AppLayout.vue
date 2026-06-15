@@ -11,6 +11,7 @@
       </button>
       <div class="nav-links" :class="{ open: menuOpen }">
         <router-link to="/app/routines" @click="menuOpen = false">Rutinas</router-link>
+        <router-link v-if="auth.isProfessor" to="/app/catalog" @click="menuOpen = false">Catálogo de Ejercicios</router-link>
         <router-link to="/app/progress" @click="menuOpen = false">
           {{ auth.isProfessor ? 'Progreso de Alumnos' : 'Mi Progreso' }}
         </router-link>
