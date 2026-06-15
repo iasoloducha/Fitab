@@ -56,6 +56,7 @@ async function handleLogout() {
 }
 
 .app-nav {
+  position: relative;
   background: var(--color-dark);
   color: white;
   padding: 1rem;
