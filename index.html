@@ -122,186 +122,109 @@
         </div>
     </section>
 
-    <!-- ============ RUTINAS / GENERADOR ============ -->
-    <section class="routines section" id="routines">
+    <!-- ============ APP / RUTINAS ============ -->
+    <section class="app-cta section" id="routines">
         <div class="container">
-            <h2 class="section-title">Generador de Rutinas</h2>
-            <p class="section-subtitle">Cargá los datos del alumno y configurá los ejercicios para cada día</p>
+            <div class="app-cta-content">
+                <div class="app-cta-text">
+                    <h2 class="section-title">Rutinas <span class="text-accent">Inteligentes</span></h2>
+                    <p class="section-subtitle">Todo el control de tu entrenamiento en una sola app</p>
 
-            <form class="routine-form" id="routineForm">
-                <!-- Datos del Alumno -->
-                <div class="form-section">
-                    <h3 class="form-title">Datos del Alumno</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="alumno-nombre">Nombre del Alumno *</label>
-                            <input type="text" id="alumno-nombre" name="alumno-nombre" required placeholder="Nombre completo">
+                    <div class="app-features">
+                        <div class="app-feature" data-delay="0">
+                            <div class="app-feature-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            </div>
+                            <div class="app-feature-text">
+                                <h4>Rutinas Personalizadas</h4>
+                                <p>Armá y seguí rutinas diseñadas por tu profesor al detalle</p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="alumno-edad">Edad</label>
-                            <input type="number" id="alumno-edad" name="alumno-edad" placeholder="Años" min="14" max="100">
+                        <div class="app-feature" data-delay="100">
+                            <div class="app-feature-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                            </div>
+                            <div class="app-feature-text">
+                                <h4>Seguimiento de Progreso</h4>
+                                <p>Registrá cada ejercicio y mirá tu evolución en el tiempo</p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="alumno-objetivo">Objetivo</label>
-                            <select id="alumno-objetivo" name="alumno-objetivo">
-                                <option value="">Seleccioná...</option>
-                                <option value="bajar-peso">Bajar de peso</option>
-                                <option value="ganar-musculo">Ganar músculo</option>
-                                <option value="mantenerse">Mantenerse</option>
-                                <option value="resistencia">Mejorar resistencia</option>
-                            </select>
+                        <div class="app-feature" data-delay="200">
+                            <div class="app-feature-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </div>
+                            <div class="app-feature-text">
+                                <h4>Ejercicios con Pesos y Series</h4>
+                                <p>Carga progresiva, repeticiones y observaciones en cada ejercicio</p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="alumno-periodo">Período</label>
-                            <input type="date" id="alumno-periodo" name="alumno-periodo">
+                        <div class="app-feature" data-delay="300">
+                            <div class="app-feature-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF5E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <div class="app-feature-text">
+                                <h4>Acceso Seguro</h4>
+                                <p>Iniciá sesión como alumno, profesor o administrador</p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="alumno-email">Email</label>
-                            <input type="email" id="alumno-email" name="alumno-email" placeholder="email@ejemplo.com">
-                        </div>
+                    </div>
+
+                    <div class="app-cta-actions">
+                        <a href="https://fitlab-alpha.vercel.app/" class="btn btn-app-hero">
+                            <span class="btn-text">Entrar a la App</span>
+                            <span class="btn-icon">→</span>
+                        </a>
+                        <a href="#plans" class="btn btn-secondary">Ver Planes</a>
                     </div>
                 </div>
 
-                <!-- Día 1 -->
-                <div class="day-section">
-                    <div class="day-title-row">
-                        <label>Día 1:</label>
-                        <input type="text" id="day1-title" class="day-title-input" value="Pierna / Fullbody" placeholder="Título del día">
+                <div class="app-cta-visual">
+                    <div class="phone-mockup">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen">
+                            <div class="phone-status">
+                                <span class="phone-time">10:30</span>
+                                <div class="phone-icons">
+                                    <span class="phone-signal"></span>
+                                    <span class="phone-wifi"></span>
+                                    <span class="phone-battery"></span>
+                                </div>
+                            </div>
+                            <div class="phone-header">FITLAB</div>
+                            <div class="phone-routine-list">
+                                <div class="phone-routine-item" style="animation-delay: 0.1s">
+                                    <div class="phone-routine-dot"></div>
+                                    <div class="phone-routine-info">
+                                        <div class="phone-bar phone-bar-lg"></div>
+                                        <div class="phone-bar phone-bar-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="phone-routine-item" style="animation-delay: 0.4s">
+                                    <div class="phone-routine-dot"></div>
+                                    <div class="phone-routine-info">
+                                        <div class="phone-bar phone-bar-lg"></div>
+                                        <div class="phone-bar phone-bar-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="phone-routine-item" style="animation-delay: 0.7s">
+                                    <div class="phone-routine-dot"></div>
+                                    <div class="phone-routine-info">
+                                        <div class="phone-bar phone-bar-lg"></div>
+                                        <div class="phone-bar phone-bar-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="phone-routine-item" style="animation-delay: 1.0s">
+                                    <div class="phone-routine-dot"></div>
+                                    <div class="phone-routine-info">
+                                        <div class="phone-bar phone-bar-lg"></div>
+                                        <div class="phone-bar phone-bar-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="exercises-list" id="day1-exercises">
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Sentadillas">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Peso muerto">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Zancadas">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12 c/p">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Elevación de talones">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="15">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Crunch en máquina">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="15">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-exercise-btn" onclick="addExercise('day1-exercises')">+ Agregar ejercicio</button>
                 </div>
-
-                <!-- Día 2 -->
-                <div class="day-section">
-                    <div class="day-title-row">
-                        <label>Día 2:</label>
-                        <input type="text" id="day2-title" class="day-title-input" value="Pecho / Tríceps" placeholder="Título del día">
-                    </div>
-                    <div class="exercises-list" id="day2-exercises">
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Press de banco">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Press inclinado">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Aperturas en banco">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Fondos en banco">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Tríceps polea">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="15">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-exercise-btn" onclick="addExercise('day2-exercises')">+ Agregar ejercicio</button>
-                </div>
-
-                <!-- Día 3 -->
-                <div class="day-section">
-                    <div class="day-title-row">
-                        <label>Día 3:</label>
-                        <input type="text" id="day3-title" class="day-title-input" value="Espalda / Bíceps" placeholder="Título del día">
-                    </div>
-                    <div class="exercises-list" id="day3-exercises">
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Arrastre">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Jornada">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="10">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Remo mancuerna">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Pullover">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="3">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                        <div class="exercise-row">
-                            <input type="text" class="exercise-name" placeholder="Nombre del ejercicio" value="Curl bíceps">
-                            <input type="text" class="exercise-sets" placeholder=" series" value="4">
-                            <input type="text" class="exercise-reps" placeholder=" rep" value="12">
-                            <input type="text" class="exercise-obs" placeholder=" obs" value="">
-                            <button type="button" class="remove-exercise" aria-label="Eliminar ejercicio">🗑</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-exercise-btn" onclick="addExercise('day3-exercises')">+ Agregar ejercicio</button>
-                </div>
-
-                <button type="button" class="btn btn-primary btn-full" onclick="saveRoutine()" style="margin-top: 30px;">Guardar Rutina</button>
-            </form>
+            </div>
         </div>
     </section>
 
