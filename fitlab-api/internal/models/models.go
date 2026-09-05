@@ -40,6 +40,7 @@ type Exercise struct {
 	DayNumber    int       `json:"day_number"`
 	Name        string    `json:"name"`
 	CatalogExerciseID *int64    `json:"catalog_exercise_id,omitempty"`
+	ImageURLs   *string   `json:"image_urls,omitempty"`
 	Sets        int       `json:"sets"`
 	Reps        string   `json:"reps"` // can be "12" or "12 c/p"
 	WeightKg    string   `json:"weight_kg,omitempty"` // can be "20 22 26" for progressive

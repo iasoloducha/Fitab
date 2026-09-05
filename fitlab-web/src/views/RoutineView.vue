@@ -41,6 +41,13 @@
             </div>
             
             <div class="exercise-actions">
+              <button
+                v-if="getExerciseImages(exercise).length > 0"
+                @click="imagesModal = exercise"
+                class="btn-images"
+                title="Ver imágenes"
+                aria-label="Ver imágenes"
+              >📷</button>
               <button 
                 v-if="auth.isStudent && !isCompletedToday(exercise.id)" 
                 @click="showLogModal(exercise)" 
@@ -234,6 +241,25 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal Ver Imágenes -->
+      <div v-if="imagesModal" class="modal-overlay" @click.self="imagesModal = null">
+        <div class="modal images-modal">
+          <h3>{{ imagesModal.name }}</h3>
+          <div class="images-grid">
+            <img
+              v-for="(url, i) in getExerciseImages(imagesModal)"
+              :key="i"
+              :src="url"
+              :alt="imagesModal.name + ' ' + (i + 1)"
+              @error="e.target.style.display = 'none'"
+            />
+          </div>
+          <div class="modal-actions">
+            <button @click="imagesModal = null" class="btn btn-secondary">Cerrar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -253,6 +279,7 @@ const routines = useRoutineStore()
 const completedToday = ref([])
 const showEditModal = ref(false)
 const showLogModalVisible = ref(false)
+const imagesModal = ref(null)
 const loggingExercise = ref(null)
 const logForm = reactive({
   actual_weight: '',
@@ -323,6 +350,16 @@ onMounted(async () => {
 
 function isCompletedToday(exerciseId) {
   return completedToday.value.includes(exerciseId)
+}
+
+function getExerciseImages(exercise) {
+  if (!exercise?.image_urls) return []
+  try {
+    const parsed = JSON.parse(exercise.image_urls)
+    return Array.isArray(parsed) ? parsed.filter(u => typeof u === 'string' && u) : []
+  } catch {
+    return []
+  }
 }
 
 function showLogModal(exercise) {
@@ -647,6 +684,23 @@ async function saveEdit() {
   background: var(--color-dark);
 }
 
+.btn-images {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.btn-images:hover {
+  background: #666;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -677,6 +731,23 @@ async function saveEdit() {
   gap: 0.5rem;
   justify-content: flex-end;
   margin-top: 1rem;
+}
+
+.images-modal {
+  max-width: 640px;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.images-grid img {
+  width: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #2a2a2a;
 }
 
 /* Responsive */

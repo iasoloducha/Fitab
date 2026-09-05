@@ -151,9 +151,11 @@ func (h *RoutineHandler) Get(c *gin.Context) {
 
 	// Get exercises
 	exerciseRows, err := h.DB.Query(`
-		SELECT id, routine_id, day_number, name, sets, reps, weight_kg, observations, sort_order, created_at
-		FROM exercises WHERE routine_id = ?
-		ORDER BY day_number, sort_order`,
+		SELECT e.id, e.routine_id, e.day_number, e.name, e.sets, e.reps, e.weight_kg, e.observations, e.sort_order, e.created_at, COALESCE(ec.image_urls, '')
+		FROM exercises e
+		LEFT JOIN exercise_catalog ec ON e.catalog_exercise_id = ec.id
+		WHERE e.routine_id = ?
+		ORDER BY e.day_number, e.sort_order`,
 		r.ID,
 	)
 	if err == nil {
@@ -162,8 +164,9 @@ func (h *RoutineHandler) Get(c *gin.Context) {
 			var e models.Exercise
 			var weightKg sql.NullString
 			var observations sql.NullString
+			var imageURLs sql.NullString
 
-			if err := exerciseRows.Scan(&e.ID, &e.RoutineID, &e.DayNumber, &e.Name, &e.Sets, &e.Reps, &weightKg, &observations, &e.SortOrder, &e.CreatedAt); err != nil {
+			if err := exerciseRows.Scan(&e.ID, &e.RoutineID, &e.DayNumber, &e.Name, &e.Sets, &e.Reps, &weightKg, &observations, &e.SortOrder, &e.CreatedAt, &imageURLs); err != nil {
 				continue
 			}
 			if weightKg.Valid {
@@ -171,6 +174,9 @@ func (h *RoutineHandler) Get(c *gin.Context) {
 			}
 			if observations.Valid {
 				e.Observations = observations.String
+			}
+			if imageURLs.Valid && imageURLs.String != "" {
+				e.ImageURLs = &imageURLs.String
 			}
 			r.Exercises = append(r.Exercises, e)
 		}
